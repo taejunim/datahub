@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC
+  "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN" 
+  "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<tiles-definitions>
+	<definition name="onePage-layout" template="/WEB-INF/view/tilesLayout/onePage/layout.jsp">
+		<put-attribute name="content"   value="" />
+	</definition>
+	<definition name="login-layout" template="/WEB-INF/view/tilesLayout/onePage/loginLayout.jsp">
+		<put-attribute name="header"   value="/WEB-INF/view/tilesLayout/onePage/header.jsp" />
+		<put-attribute name="content"   value="/WEB-INF/view/tilesLayout/onePage/loginLayout.jsp" />
+		<put-attribute name="footer"   value="/WEB-INF/view/tilesLayout/onePage/footer.jsp" />
+	</definition>
+	<definition name="ajax-layout" template="/WEB-INF/view/tilesLayout/onePage/ajaxLayout.jsp">
+		<put-attribute name="content"   value="" />
+	</definition>
+
+	<definition name="ajax/*" extends="ajax-layout">
+		<put-attribute name="content"   value="/WEB-INF/view/ajax/{1}.jsp" />
+	</definition>
+	<definition name="ajax/*/*" extends="ajax-layout">
+		<put-attribute name="content"   value="/WEB-INF/view/ajax/{1}/{2}.jsp" />
+	</definition>
+
+	<definition name="system/login" extends="login-layout">
+		<put-attribute name="content"   value="/WEB-INF/view/system/login.jsp" />
+	</definition>
+
+	<definition name="system/find" extends="login-layout">
+		<put-attribute name="content"   value="/WEB-INF/view/system/find.jsp" />
+	</definition>
+
+	<definition name="system/join" extends="login-layout">
+		<put-attribute name="content"   value="/WEB-INF/view/system/join.jsp" />
+	</definition>
+	
+	<definition name="system/window/icons" extends="onePage-layout">
+		<put-attribute name="content"   value="/WEB-INF/view/system/window/icons.jsp" />
+	</definition>
+
+	<definition name="error/*" extends="onePage-layout">
+		<put-attribute name="content"   value="/WEB-INF/view/error/{1}.jsp" />
+	</definition>
+	<definition name="page/media/image" extends="onePage-layout">
+		<put-attribute name="content"   value="/WEB-INF/view/page/media/image.jsp" />
+	</definition>
+</tiles-definitions>

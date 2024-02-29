@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:/config/properties/globals-${spring.profiles.active}.properties</value>
+            </list>
+        </property>
+    </bean>
+
+	<!-- DataSource -->
+    <alias name="dataSource-${AppConf.db.DbType}" alias="dataSourceMysql"/>
+    <alias name="dataSource-${AppConf.db.DbType2}" alias="dataSourcePostgres"/>
+
+    <!--<alias name="dataSource-${Globals.Min.DbType}" alias="min.dataSource"/>
+    <alias name="dataSource-${Globals.Sms.DbType}" alias="sms.dataSource"/>
+     --><!-- <alias name="dataSource-${Globals.Oracle.DbType}" alias="oracle.dataSource"/> -->
+
+	<!-- Oracle
+	<bean id="dataSource-oracle" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${AppConf.db.DriverClassName}"/>
+		<property name="url" value="${AppConf.db.Url}" />
+		<property name="username" value="${AppConf.db.UserName}"/>
+		<property name="password" value="${AppConf.db.Password}"/>
+	</bean>  
+	-->
+	
+	<!-- Oracle -->
+	<!-- <bean id="dataSource-oracle2" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${AppConf.db.DriverClassName_Gw}"/>
+		<property name="url" value="${AppConf.db.Url_Gw}" />
+		<property name="username" value="${AppConf.db.UserName_Gw}"/>
+		<property name="password" value="${AppConf.db.Password_Gw}"/>
+	</bean> 
+ -->
+	<!-- MySQL --> 
+	<bean id="dataSource-mysql" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${AppConf.db.DriverClassName}"/>
+		<property name="url" value="${AppConf.db.Url}" />
+		<property name="username" value="${AppConf.db.UserName}"/>
+		<property name="password" value="${AppConf.db.Password}"/>
+		<property name="timeBetweenEvictionRunsMillis" value="60000"/>
+		<property name="validationQuery" value="select 1" />
+		<property name="testWhileIdle" value="true" />
+	</bean>
+
+	<!-- Postgres -->
+	<bean id="dataSource-Postgres" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${AppConf.db.DriverClassName2}"/>
+		<property name="url" value="${AppConf.db.Url2}" />
+		<property name="username" value="${AppConf.db.UserName2}"/>
+		<property name="password" value="${AppConf.db.Password2}"/>
+		<property name="timeBetweenEvictionRunsMillis" value="60000"/>
+		<property name="validationQuery" value="select 1" />
+		<property name="testWhileIdle" value="true" />
+	</bean>
+
+	<!-- MsSQL 
+	<bean id="dataSource-mssql" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${AppConf.db.DriverClassName}"/>
+		<property name="url" value="${AppConf.db.Url}" />
+		<property name="username" value="${AppConf.db.UserName}"/>
+		<property name="password" value="${AppConf.db.Password}"/>
+	</bean>
+	
+	<bean id="dataSource-mssql1" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${Globals.Sms.DriverClassName}"/>
+		<property name="url" value="${Globals.Sms.Url}" />
+		<property name="username" value="${Globals.Sms.UserName}"/>
+		<property name="password" value="${Globals.Sms.Password}"/>
+	</bean>-->
+	
+
+
+	<!-- Altibase 
+	<bean id="dataSource-altibase" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${AppConf.db.DriverClassName}"/>
+		<property name="url" value="${AppConf.db.Url}" />
+		<property name="username" value="${AppConf.db.UserName}"/>
+		<property name="password" value="${AppConf.db.Password}"/>
+	</bean>
+-->
+	<!-- Tibero 
+	<bean id="dataSource-tibero" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${AppConf.db.DriverClassName}"/>
+		<property name="url" value="${AppConf.db.Url}" />
+		<property name="username" value="${AppConf.db.UserName}"/>
+		<property name="password" value="${AppConf.db.Password}"/>
+	</bean>
+-->
+    <!-- cubrid 
+    <bean id="dataSource-cubrid" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${AppConf.db.DriverClassName}"/>
+        <property name="url" value="${AppConf.db.Url}" />
+        <property name="username" value="${AppConf.db.UserName}"/>
+        <property name="password" value="${AppConf.db.Password}"/>
+    </bean>
+-->
+
+    <!-- DB Pool이 생성이 되더라고 특정 시간 호출되지 않으면 DBMS 설정에 따라 연결을 끊어질 때
+		이 경우 DBCP를 사용하셨다면.. 다음과 같은 설정을 추가하시면 연결을 유지시켜 줍니다. -->
+	<!--
+	<property name="validationQuery" value="select 1 from dual" />
+	<property name="testWhileIdle" value="true" />
+	<property name="timeBetweenEvictionRunsMillis" value="60000" /> -->  <!-- 1분 -->
+
+	<!-- DBCP가 아닌 WAS의 DataSource를 사용하시는 경우도 WAS별로 동일한 설정을 하실 수 있습니다.
+		(WAS별 구체적인 설정은 WAS document 확인) -->
+</beans>

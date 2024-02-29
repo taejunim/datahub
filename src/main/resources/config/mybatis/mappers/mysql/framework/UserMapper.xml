@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.jcms.framework.security.mapper.UserMapper">
+
+	<sql id="tb"> JCMS_USER </sql>
+	<sql id="jtb">
+		JCMS_USER JU
+		LEFT JOIN JCMS_ROLE ON ROLE_AUTH = (SELECT ROLE_AUTH FROM JCMS_USER_ROLE WHERE USER_ID = JU.USER_ID)
+	</sql>
+	<sql id="s">
+		SELECT USER_ID, USER_LOGIN_ID, USER_PWD, USER_NM, JU.ADDR, USER_ST, JU.REG_DT, FAIL_CNT, USER_OUT_RSN,
+			ROLE_AUTH, ROLE_NM
+	</sql>
+	<sql id="l">
+		SELECT USER_ID, USER_LOGIN_ID, USER_PWD, USER_NM, ADDR, USER_ST, REG_DT, FAIL_CNT, USER_OUT_RSN,
+			(SELECT ROLE_NM FROM JCMS_ROLE WHERE ROLE_AUTH = (SELECT ROLE_AUTH FROM JCMS_USER_ROLE WHERE USER_ID = JU.USER_ID)) AS ROLE_NM
+	</sql>
+	<sql id="sf"> FROM <include refid="jtb"/> </sql>
+	<sql id="lf"> FROM <include refid="tb"/> JU </sql>
+	<sql id="sw">
+		<where>
+			<if test="!empty(userLoginId)" > USER_LOGIN_ID = #{userLoginId} </if>
+			<if test="!empty(userId)" > AND USER_ID = #{userId} </if>
+			<if test="!empty(userNm)" > AND USER_NM = #{userNm} </if>
+		</where>
+	</sql>
+	<sql id="lw">
+		WHERE 1 = 1
+			<if test="!empty(userLoginIdLike)" > AND USER_LOGIN_ID LIKE CONCAT('%', #{userLoginIdLike}, '%') </if>
+			<if test="!empty(userNmLike)" > AND USER_NM LIKE CONCAT('%', #{userNmLike}, '%') </if>
+			<if test="!empty(roleAuth)" > AND (SELECT ROLE_AUTH FROM JCMS_USER_ROLE WHERE USER_ID = JU.USER_ID) = #{roleAuth} </if>
+			<if test="!empty(userSt)" > AND USER_ST = #{userSt} </if>
+	</sql>
+	<sql id="ord">
+		<if test="!empty(sort) and !empty(sortOrd)"> ORDER BY ${sort} ${sortOrd} </if>
+		<if test="pagingYn == true"> limit #{start}, #{length} </if>
+	</sql>
+
+
+	<select id="select" parameterType="userSearch" resultType="user">
+		<include refid="s"/>
+		<include refid="sf"/>
+		<include refid="sw"/>
+	</select>
+
+	<select id="selectList" parameterType="userSearch" resultType="user">
+		<include refid="l"/>
+		<include refid="lf"/>
+		<include refid="lw"/>
+		<include refid="ord"/>
+	</select>
+
+	<select id="count" parameterType="userSearch" resultType="java.lang.Integer">
+		SELECT COUNT(USER_ID)
+		<include refid="lf"/>
+		<include refid="lw"/>
+	</select>
+	
+	<select id="checkIdDuplicate" parameterType="userSearch" resultType="java.lang.Integer">
+		SELECT COUNT(USER_ID)
+		FROM <include refid="tb"/>
+		WHERE USER_LOGIN_ID = #{userLoginId}
+	</select>
+	
+	<select id="login" parameterType="user" resultType="user">
+		SELECT USER_ID, USER_LOGIN_ID, USER_PWD, USER_NM, USER_ST, FAIL_CNT
+		FROM <include refid="tb"/>
+		WHERE USER_LOGIN_ID = #{userLoginId}
+			AND USER_ST = '1'
+	</select>
+	
+	<select id="userPwdCheck" parameterType="userSearch" resultType="java.lang.Integer">
+		SELECT COUNT(USER_ID)
+		FROM <include refid="tb"/>
+		WHERE USER_ID = #{userId}
+			AND USER_PWD = #{userPwd}
+	</select>
+	
+	<insert id="insert" parameterType="user" useGeneratedKeys="true" keyProperty="userId" keyColumn="USER_ID">
+		INSERT INTO <include refid="tb"/> (
+			USER_LOGIN_ID, USER_NM, USER_PWD, USER_DI, ADDR, FAIL_CNT,
+			USER_ST, USER_OUT_RSN, REG_ID, REG_DT, UPD_ID, UPD_DT, DEL_ID, DEL_DT, REC_ST
+		) VALUES (
+			#{userLoginId}, #{userNm}, #{userPwd}, #{userDi}, #{addr}, 0,
+			1, #{userOutRsn}, #{regId}, SYSDATE(), #{updId}, #{updDt}, #{delId}, #{delDt}, 'Y' )
+	</insert>
+	
+	<update id="update" parameterType="user">
+		UPDATE <include refid="tb"/>
+		SET <include refid="BaseSql.Update"/>
+			<if test="isNotNull(userPwd)" > ,USER_PWD = #{userPwd} </if>
+			<if test="isNotNull(userNm)" > ,USER_NM = #{userNm} </if>
+			<if test="isNotNull(addr)" > ,ADDR = #{addr} </if>
+			<if test="isNotNull(userSt)" > , USER_ST = #{userSt} </if>
+			<if test="isNotNull(userOutRsn)" > , USER_OUT_RSN = #{userOutRsn} </if>
+		WHERE USER_ID = #{userId}
+	</update>
+	
+	<update id="delete" parameterType="user">
+		UPDATE <include refid="tb"/>
+		SET <include refid="BaseSql.Delete"/>
+		WHERE USER_ID = #{userId}
+	</update>
+	
+	<update id="updateUserLoginFail" parameterType="user">
+		UPDATE <include refid="tb"/>
+		SET FAIL_CNT = #{failCnt}
+		WHERE USER_ID = #{userId}
+	</update>
+	
+	<update id="updateInitUserLoginFailCnt" parameterType="user">
+		UPDATE <include refid="tb"/>
+		SET FAIL_CNT = 0
+		WHERE USER_ID = #{userId}
+	</update>
+	
+	<update id="updatePwd" parameterType="user">
+		UPDATE <include refid="tb"/>
+		SET USER_PWD = #{userPwd}
+		WHERE USER_ID = #{userId}
+	</update>
+	
+</mapper>

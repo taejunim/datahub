@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.datahub.martData.mapper.DtlLnkgRoadRiskIdxMapper">
+	<!-- ### 메크로 정의 -->
+	<sql id="tb"> datamart.dtl_lnkg_road_risk_idx </sql>
+	<sql id="s"> select * </sql>
+	<sql id="sl"> select 
+		id,
+		dat_st_id,
+		crt_dt,
+		mdfcn_dt,
+		dat_sn,
+		dat_sn_crt_dt,
+		dat_sn_mdfcn_dt,
+		sctn_crd,
+		sctn_crd_crt_dt,
+		sctn_crd_mdfcn_dt,
+		dggr_idx,
+		dggr_idx_crt_dt,
+		dggr_idx_mdfcn_dt,
+		dggr_grd,
+		dggr_grd_crt_dt,
+		dggr_grd_mdfcn_dt
+	</sql>
+	<sql id="f"> from <include refid="tb"/> </sql>
+	<sql id="lw">
+		<where>
+			<if test="!empty(recSt)"> and REC_ST = #{recSt} </if>
+			<include refid="BaseSql.BaseWhere"/>
+			and dggr_grd <![CDATA[ <> ]]> '01'
+		</where>
+	</sql>
+	<sql id="fw">
+		<where>
+			and id = #{id}
+			<include refid="BaseSql.BaseWhere"/>
+		</where>
+	</sql>
+	<sql id="ord">
+		<if test="empty(sort)"> order by id </if>
+		<if test="!empty(sort)"> order by ${sort} </if>
+		<if test="!empty(sortOrd)"> ${sortOrd} </if>
+		<if test="pagingYn == true" > limit #{start}, #{length}	</if>
+	</sql>
+	<!-- ### Select -->
+	<select id="select" parameterType="dtlLnkgRoadRiskIdx" resultType="dtlLnkgRoadRiskIdx">
+		<include refid="s"/>
+		<include refid="f"/>
+		<include refid="fw"/>
+	</select>
+
+	<!-- ### selectList -->
+	<select id="selectList" parameterType="dtlLnkgRoadRiskIdx" resultType="dtlLnkgRoadRiskIdx">
+		<include refid="sl"/>
+		<include refid="f"/>
+		<include refid="lw"/>
+		<include refid="ord"/>
+	</select>
+	<!-- ### Count -->
+	<select id="count" parameterType="dtlLnkgRoadRiskIdx" resultType="java.lang.Integer">
+		select COUNT(*)
+		<include refid="f"/>
+		<include refid="lw"/>
+	</select>
+	<!-- ### Insert -->
+	<insert id="insert" parameterType="dtlLnkgRoadRiskIdx" >
+		insert into dtl_lnkg_road_risk_idx (
+			id,
+			dat_st_id,
+			crt_dt,
+			mdfcn_dt,
+			dat_sn,
+			dat_sn_crt_dt,
+			dat_sn_mdfcn_dt,
+			sctn_crd,
+			sctn_crd_crt_dt,
+			sctn_crd_mdfcn_dt,
+			dggr_idx,
+			dggr_idx_crt_dt,
+			dggr_idx_mdfcn_dt,
+			dggr_grd,
+			dggr_grd_crt_dt,
+			dggr_grd_mdfcn_dt
+			<include refid="BaseSql.InRegRecStPrm"/>
+		) values (
+			#{id},
+			#{datStId},
+			#{crtDt},
+			#{mdfcnDt},
+			#{datSn},
+			#{datSnCrtDt},
+			#{datSnMdfcnDt},
+			#{sctnCrd},
+			#{sctnCrdCrtDt},
+			#{sctnCrdMdfcnDt},
+			#{dggrIdx},
+			#{dggrIdxCrtDt},
+			#{dggrIdxMdfcnDt},
+			#{dggrGrd},
+			#{dggrGrdCrtDt},
+			#{dggrGrdMdfcnDt}
+			<include refid="BaseSql.InRegRecStVal"/>
+		)
+	</insert>
+
+	<!-- ### update -->
+	<update id="update" parameterType="dtlLnkgRoadRiskIdx">
+		update <include refid="tb"/> set
+			dat_st_id= #{datStId}
+			<if test="isNotNull(crtDt)" > , crt_dt= #{crtDt} </if>
+			<if test="isNotNull(mdfcnDt)" > , mdfcn_dt= #{mdfcnDt} </if>
+			<if test="isNotNull(datSn)" > , dat_sn= #{datSn} </if>
+			<if test="isNotNull(datSnCrtDt)" > , dat_sn_crt_dt= #{datSnCrtDt} </if>
+			<if test="isNotNull(datSnMdfcnDt)" > , dat_sn_mdfcn_dt= #{datSnMdfcnDt} </if>
+			<if test="isNotNull(sctnCrd)" > , sctn_crd= #{sctnCrd} </if>
+			<if test="isNotNull(sctnCrdCrtDt)" > , sctn_crd_crt_dt= #{sctnCrdCrtDt} </if>
+			<if test="isNotNull(sctnCrdMdfcnDt)" > , sctn_crd_mdfcn_dt= #{sctnCrdMdfcnDt} </if>
+			<if test="isNotNull(dggrIdx)" > , dggr_idx= #{dggrIdx} </if>
+			<if test="isNotNull(dggrIdxCrtDt)" > , dggr_idx_crt_dt= #{dggrIdxCrtDt} </if>
+			<if test="isNotNull(dggrIdxMdfcnDt)" > , dggr_idx_mdfcn_dt= #{dggrIdxMdfcnDt} </if>
+			<if test="isNotNull(dggrGrd)" > , dggr_grd= #{dggrGrd} </if>
+			<if test="isNotNull(dggrGrdCrtDt)" > , dggr_grd_crt_dt= #{dggrGrdCrtDt} </if>
+			<if test="isNotNull(dggrGrdMdfcnDt)" > , dggr_grd_mdfcn_dt= #{dggrGrdMdfcnDt} </if>
+			<include refid="BaseSql.Update" />
+			<include refid="fw"/>
+	</update>
+
+	<!-- ### delete -->
+	<update id="delete" parameterType="dtlLnkgRoadRiskIdx" >
+		update <include refid="tb"/> set
+		<include refid="BaseSql.Delete" />
+		<include refid="fw"/>
+	</update>
+
+	<select id="getDggrGrdDistKinds" resultType="java.lang.String">
+		select dggr_grd
+		<include refid="f"/>
+		where dggr_grd <![CDATA[ <> ]]> '01'
+		group by dggr_grd
+	</select>
+</mapper>

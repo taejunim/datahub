@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.datahub.martAcdntRcptInfo.mapper.MartAcdntRcptInfoMapper">
+	<!-- ### 메크로 정의 -->
+	<!-- ### selectList -->
+	<select id="selectList" parameterType="martAcdntRcptInfo" resultType="martAcdntRcptInfo">
+		select
+		id,
+		dat_st_id,
+		crt_dt,
+		mdfcn_dt,
+		oper_co,
+		oper_co_crt_dt,
+		oper_co_mdfcn_dt,
+		sexd,
+		sexd_crt_dt,
+		sexd_mdfcn_dt,
+		brdt,
+		brdt_crt_dt,
+		brdt_mdfcn_dt,
+		acdnt_ocrn_dt,
+		acdnt_ocrn_dt_crt_dt,
+		acdnt_ocrn_dt_mdfcn_dt,
+		acdnt_ocrn_plc,
+		acdnt_ocrn_plc_crt_dt,
+		acdnt_ocrn_plc_mdfcn_dt,
+		acdnt_type,
+		acdnt_type_crt_dt,
+		acdnt_type_mdfcn_dt,
+		acdnt_cn,
+		acdnt_cn_crt_dt,
+		acdnt_cn_mdfcn_dt
+		from datamart.acdnt_rcpt_info
+		<where>
+			<if test="isNotNull(crtDt)" > crt_dt >= #{crtDt} </if>
+		</where>
+		order by crt_dt
+	</select>
+
+</mapper>

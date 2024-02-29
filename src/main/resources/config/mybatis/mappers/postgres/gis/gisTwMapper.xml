@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.datahub.gis.tw.mapper.GisTwMapper">
+    <select id="selectChildSafetyInformation" resultType="egovMap">
+        SELECT id
+             , dat_st_id
+             , road_nm_addr
+             , schl_nm              AS name
+             , ptcn_zone_rng        AS area
+             , ptcn_zone_rng_info   AS location
+        FROM datamart.ptcn_zone_bk
+    </select>
+
+    <select id="selectChildSafetyAreaInformation" resultType="egovMap">
+        SELECT MAX(id)
+             , ptcn_zone_rng AS area
+        FROM datamart.ptcn_zone_bk
+        GROUP BY ptcn_zone_rng
+    </select>
+
+    <select id="selectEldSafetyAreaInformation" resultType="egovMap">
+        SELECT MAX(id)
+             , ptcn_zone_rng AS area
+        FROM datamart.eld_ptcn_zone
+        GROUP BY ptcn_zone_rng
+    </select>
+
+    <select id="selectPwdbsSafetyAreaInformation" resultType="egovMap">
+        SELECT MAX(id)
+             , ptcn_zone_rng AS area
+        FROM datamart.pwdbs_ptcn_zone
+        GROUP BY ptcn_zone_rng
+    </select>
+
+    <select id="selectChildSafetyAreaLocationInformation" resultType="egovMap">
+          SELECT id
+               , schl_nm                 AS name
+               , ptcn_zone_rng_info      AS location
+               , road_nm_addr            AS road_nm_addr
+          FROM datamart.ptcn_zone_bk
+          WHERE (crt_dt, schl_nm)
+          IN (
+              SELECT MAX(crt_dt), schl_nm
+              FROM datamart.ptcn_zone_bk
+              GROUP BY schl_nm
+          )
+    </select>
+
+    <select id="selectEldSafetyAreaLocationInformation" resultType="egovMap">
+          SELECT id
+               , fclt_nm        AS name
+               , fclt_lat_lot   AS location
+               , fclt_lctn      AS road_nm_addr
+          FROM datamart.eld_ptcn_fclt
+          WHERE (crt_dt, fclt_nm)
+          IN (
+              SELECT MAX(crt_dt), fclt_nm
+              FROM datamart.eld_ptcn_fclt
+              GROUP BY fclt_nm
+          )
+    </select>
+
+    <select id="selectPwdbsSafetyAreaLocationInformation" resultType="egovMap">
+            SELECT id
+                 , fclt_nm        AS name
+                 , fclt_lat_lot   AS location
+                 , fclt_lctn      AS road_nm_addr
+            FROM datamart.pwdbs_ptcn_fclt
+            WHERE (crt_dt, fclt_nm)
+            IN (
+                SELECT MAX(crt_dt), fclt_nm
+                FROM datamart.pwdbs_ptcn_fclt
+                GROUP BY fclt_nm
+            )
+    </select>
+
+    <select id="selectCctvInformation" resultType="egovMap">
+       SELECT  MAX(id)              AS id
+             , replace(cctv_rng_info, ',' ,' ')        AS location
+             , MAX(cctv_type)       AS detail
+       FROM datamart.cctv
+       GROUP BY replace(cctv_rng_info, ',' ,' ')
+    </select>
+
+    <select id="selectChildPickupZoneInformation" resultType="egovMap">
+        SELECT MAX(id)         AS id
+             , onaoff_zone_rng AS area
+        FROM datamart.cld_onaoff_zone
+        GROUP BY onaoff_zone_rng
+    </select>
+
+    <select id="selectChildWaySchoolInformation" resultType="egovMap">
+        SELECT MAX(id)   AS id
+             , fpath_rng AS area
+        FROM datamart.cld_fpath
+        GROUP BY fpath_rng
+    </select>
+
+    <select id="selectCrossWalkInformation" resultType="egovMap">
+       SELECT MAX(id)      AS id
+             , pedcrss_rng AS area
+       FROM datamart.pedcrss
+       GROUP BY pedcrss_rng
+    </select>
+
+    <select id="selectCrossWayInformation" resultType="egovMap">
+       SELECT MAX(id)    AS id
+             , crsrd_rng AS area
+       FROM datamart.crsrd
+       GROUP BY crsrd_rng
+    </select>
+
+    <select id="selectOneWayRoadInformation" resultType="egovMap">
+       SELECT MAX(id)            AS id
+            , onwy_pang_road_rng AS area
+        FROM datamart.onwy_pang_road
+        GROUP BY onwy_pang_road_rng
+    </select>
+
+    <select id="selectSpeedBumpInformation" resultType="egovMap">
+        SELECT MAX(id)  AS id
+             , spbm_rng AS area
+        FROM datamart.ovrs_spbm
+        GROUP BY spbm_rng
+    </select>
+
+    <select id="selectFenceInformation" resultType="egovMap">
+        SELECT MAX(id) AS id
+             , area5186 AS area
+             , MAX(tempLocation) AS location
+        FROM (
+            SELECT * ,
+                   CONCAT(latitude, ',', longitude) tempLocation
+            FROM (
+                SELECT id       AS id
+                     , (substr(startlocation, 0, position(',' IN startlocation))::DOUBLE PRECISION
+                            + substr(temp.endlocation, 0, position(',' IN endlocation))::DOUBLE PRECISION) / 2 AS latitude
+                     , (substr(startlocation, position(',' IN startlocation) + 1)::DOUBLE PRECISION
+                            + substr(endlocation, position(',' IN endlocation) + 1)::DOUBLE PRECISION) / 2 AS longitude
+                     , area5186
+                FROM (
+                      SELECT id
+                           , replace(startlocation, ' ', '') startlocation
+                           , replace(endlocation, ' ', '') endlocation
+                           , area5186
+                      FROM datamart.prt_fece
+                     ) temp
+                ) B
+            ) A
+        GROUP BY area5186
+    </select>
+
+    <select id="selectRoadSafetyInformation" resultType="egovMap">
+        SELECT id
+             , evt_rng      AS location
+             , bst_cd       AS detail
+        FROM datamart.road_risk_sin_info
+        WHERE (crt_dt, evt_rng)
+        IN (
+            SELECT  MAX(crt_dt) , evt_rng
+            FROM datamart.road_risk_sin_info
+            GROUP BY evt_rng
+        )
+    </select>
+
+    <select id="selectRoadControlInformation" resultType="egovMap">
+        SELECT id
+             , cntrl_rng    AS location
+             , dtl_msg      AS detail
+        FROM datamart.road_cntrl_info
+        WHERE (crt_dt, cntrl_rng)
+        IN (
+            SELECT  MAX(crt_dt) , cntrl_rng
+            FROM datamart.road_cntrl_info
+            GROUP BY cntrl_rng
+        )
+    </select>
+
+    <select id="selectRoadWorkZoneInformation" resultType="egovMap">
+    SELECT id
+         , job_rng   AS location
+         , dtl_msg   AS detail
+    FROM datamart.road_job_sctn_info
+    WHERE (crt_dt, job_rng)
+    IN (
+        SELECT MAX(crt_dt), job_rng
+        FROM datamart.road_job_sctn_info
+        GROUP BY job_rng
+    )
+    </select>
+</mapper>

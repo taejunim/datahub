@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.datahub.pm.mapper.PostgresGInfraMapper">
+    <select id="selectPmModHBList" resultMap="GInfraResultMap">
+        SELECT
+            g.id AS id
+          , COALESCE(CAST(split_part(g.modhb_rng_info, ',', 1) AS double precision), 0) AS location_x
+          , COALESCE(CAST(split_part(g.modhb_rng_info, ',', 2) AS double precision), 0) AS location_y
+        FROM datamart.modhb AS g
+    </select>
+
+    <select id="selectPmPedcrssList" resultMap="GInfraResultMap">
+        SELECT
+            g.id AS id
+             , COALESCE(CAST(split_part(g.pedcrss_rng_info, ',', 1) AS double precision), 0) AS location_x
+             , COALESCE(CAST(split_part(g.pedcrss_rng_info, ',', 2) AS double precision), 0) AS location_y
+        FROM datamart.pedcrss AS g
+    </select>
+
+    <select id="selectPmCrsrdList" resultMap="GInfraResultMap">
+        SELECT
+            g.id AS id
+             , COALESCE(CAST(split_part(g.crsrd_rng_info, ',', 1) AS double precision), 0) AS location_x
+             , COALESCE(CAST(split_part(g.crsrd_rng_info, ',', 2) AS double precision), 0) AS location_y
+        FROM datamart.crsrd AS g
+    </select>
+
+    <select id="selectPmSmhList" resultMap="GInfraResultMap">
+        SELECT
+            g.id AS id
+             , COALESCE(CAST(split_part(g.smh_rng, ',', 1) AS double precision), 0) AS location_x
+             , COALESCE(CAST(split_part(g.smh_rng, ',', 2) AS double precision), 0) AS location_y
+        FROM datamart.smh AS g
+    </select>
+
+    <select id="selectPmFisvcFcltList" resultMap="GInfraResultMap">
+        SELECT
+            g.id AS id
+             , COALESCE(CAST(split_part(g.fisvc_fclt_rng, ',', 1) AS double precision), 0) AS location_x
+             , COALESCE(CAST(split_part(g.fisvc_fclt_rng, ',', 2) AS double precision), 0) AS location_y
+        FROM datamart.fisvc_fclt AS g
+    </select>
+
+    <select id="selectPmStonList" resultMap="GInfraResultMap">
+        SELECT
+            g.id AS id
+             , COALESCE(CAST(split_part(g.ston_rng, ',', 1) AS double precision), 0) AS location_x
+             , COALESCE(CAST(split_part(g.ston_rng, ',', 2) AS double precision), 0) AS location_y
+        FROM datamart.ston AS g
+    </select>
+
+    <resultMap id="GInfraResultMap" type="GInfra">
+        <id property="id" column="id" />
+        <result property="location_x" column="location_x" />
+        <result property="location_y" column="location_y" />
+    </resultMap>
+</mapper>

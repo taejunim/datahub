@@ -1,0 +1,233 @@
+@charset "utf-8"; @media( max-width: 1730px ){
+    .header .gnb > ul > li > a { font-size: 16px; } 
+    .header .util ul li a { font-size:15px; } 
+    }
+    @media( max-width: 1680px ){
+    .header .gnb > ul > li > a { font-size: 16px; padding: 0 21px; } 
+    .header .util ul li a { font-size:14px; } 
+    }
+    @media( max-width: 1556px ){
+    .header .gnb > ul > li > a { font-size: 15px; padding: 0 15px; } 
+    .header .util ul li a { font-size:14px; } 
+    }
+    @media( max-width: 1440px ){
+    .header .gnb { left:360px; } 
+    .header .gnb > ul > li > a { padding: 0 13px; } 
+    .header .util ul li a { font-size:14px; } 
+    }
+    @media( max-width: 1340px ){
+    .header .logo { width:260px; } 
+    .header .logo a img { width:100%; } 
+    .header .gnb { left:310px; } 
+    .header .gnb > ul > li > a { padding: 0 13px; } 
+    .header .util ul li a { font-size:13px; } 
+    }
+    @media( min-width: 920px ){
+    .btn-group { display: inline-block; vertical-align: middle; } 
+    }
+    @media(max-width: 1280px){
+    .header .logo { top: 50%; left: 50%; transform: translate(-50%, -50%); height: 36px; } 
+    .header .logo a img { position: static; } 
+    .sub-open-btn { display:block; } 
+    .util { display:none; } 
+    .gnb { display: none; } 
+    .lnb { display:none; } 
+    .layer_modal_wrap{ display:none; } 
+    .contentsBody { padding-left:30px; } 
+    .search-box .searchForm { width: calc(100% - 230px); } 
+    .m-menu-con { display: block; } 
+    .footer .footerInfo img { float:none; margin:0 auto; display: block; margin-bottom: 30px; } 
+    .footer .footerInfo .footerTxt { float:none; text-align: center; } 
+    .footer .footerLink ul { text-align: center; } 
+    .footer .footerLink ul li { float:none; display:inline-block; vertical-align: middle; } 
+    .footer .footerInfo .selectSiteMap { display: none; } 
+    .search-box.searchCondition .formItem { width:100%; } 
+    .search-box.searchCondition.loginData .formItem { width: auto; } 
+    .search-box.checkSet .formItem { width: auto; } 
+    .search-box.searchCondition .formItem .searchForm { width: calc(100% - 230px); } 
+    .search-box.searchCondition .formItem .searchForm.search100 { width: calc(100% - 80px); } 
+    .btn-group { width:100%; text-align: center; } 
+    .btn-wrap { text-align: center !important; } 
+    .layerPop.ycWaterObsrSearch { width:80%; } 
+    .layerPop.ycWaterObsrSearch .colImgBox { width:100%; float:none; } 
+    .layerPop.ycWaterObsrSearch .pop-table { width:100%; float:none; } 
+    .joinProcess ul li { width: 48%; margin-bottom: 9px; } 
+    .phoneCrtfcCheck-area .phoneCrtfcCheck-box { width:100%; } 
+    .layerPop {display:none;}
+    .layerPop2 {/*display:none;*/}
+    .layerPop3 {/*display:none;*/}
+    .layerPop4 {display:none;}
+    .layerPop5 {display:none;}
+    .layerPop6 {display:none;}
+    .layerPop7 {display:none;}
+    .layerPop8 {/*display:none;*/}
+    .progress-body {left: 0!important; width: 100%!important;}
+    .modal-show .layerPop { display: block;}
+    .layer-navi-inactive { transform: translate(0, 0) !important; }
+    .gis-range-wrapper { left: 0!important; padding-left: 5px!important; transition: none!important; }
+    #legend { left: 0!important; transition: none!important; }
+    .dtllnkg-legend-container { left: 0!important; transition: none!important; }
+    }
+    @media( max-width: 920px ){
+    .contentsBody {padding: 100px 20px 20px 20px;} 
+    .contentsHd .location { margin-top: 6px; } 
+    .search-box .searchForm { width: calc(100% - 230px); } 
+    .search-box .btn-group { text-align: center; margin-top:15px; } 
+    .option-area .form-tit { display: block; margin-bottom:5px; } 
+    .writeTable.conRegister th { width:130px !important; } 
+    .ycWater-infoImg ul li { width:100%; height: auto; float:none; margin-bottom:20px; } 
+    .ycWater-infoImg ul li:last-child { display:none; } 
+    .ycWater-infoImg ul li img { height:auto; } 
+    .contentsReserch .reserchHd strong { width:100%; display: block; } 
+    .contentsReserch .reserchHd .contact { float:none; } 
+    .researchCon p { float:none; margin-bottom: 10px; } 
+    .researchCon .formGroup { float:none; width:100%; } 
+    .layerPop { width: 80%; } 
+    .layerPop .layerPop-header strong { font-size:20px; } 
+    .layerPop .popTable-wrap { height: 260px; overflow-x: auto; } 
+    .layerPop .pop-table { width: 1000px; } 
+    .layerPop .layerPop-con { height:auto; } 
+    .layerPop.obsrRegister .pop-table { width: 100%; } 
+    .layerPop.obsrSearch .pop-table { width: 100%; } 
+    .layerPop.obsrSearch .colImgBox { height: 200px; } 
+    .layerPop.partData-using table { width:100%; } 
+    .layerPop.gwData-using table { width:100%; } 
+    .layerPop.apiSignUp table { width:100%; } 
+    .joinBox { padding: 10% 5% !important; } 
+    .joinBox .formRow.pw input[type="password"] { width: 100%; } 
+    .joinBox .formRow.adress .formBox .adressDtl input[type="text"] { width: calc(100% - 80px); } 
+    .joinBox .formRow.user input[type="text"] { width:100%; } 
+    .joinBox .formRow.id input[type="text"] { width: calc(100% - 90px); } 
+    .joinBox .formRow.adress .formBox .postFind input[type="text"] { width: calc(100% - 90px); } 
+    .contents.full.login .contentsBody { background:none; height: auto; } 
+    .loginWrap { width: 90%; top: 0; left: 0; transform: none; margin: 0 auto; } 
+    .contents_wrap3 {display: flex;}
+    .formhd-tit {font-size: 14px;}
+    .inforAll .inforArea {font-size: 12px;}
+    .form-name {font-size: 14px;}
+    .cmnBtn:not(.layerPop8 .cmnBtn, .layerPop3 .cmnBtn) {min-width: 100%;margin-bottom: 5px;margin: 5px !important;}
+    .printingBtn {min-width: 100%;margin-bottom: 5px;margin: 3px !important;}
+    .tableWrap {overflow: auto;}
+    .listTable {width: 1080px;}
+    .overflow {overflow: auto;}
+    .popup-box {overflow: auto;}
+    .detailTable {width: 1080px;}
+    .mapTable {overflow: auto;}
+    }
+    @media( max-width: 810px ){
+    .layerPop2 {width:100vw;}
+    .layerPop3 {width:100vw;}
+    .layerPop8 {width:100vw;}
+    }
+    @media( max-width: 660px ){
+    .search-box .searchForm { width: calc(100% - 230px); } 
+    .contentsHd .contentsTit {width: 100%;float: none;text-align: center;padding-bottom: 10px;background: none;} 
+    .contentsHd .location { float: none; width: 100%; padding-bottom: 20px; } 
+    .contentsHd .location ul { text-align: center; } 
+    .contentsHd .location ul li { display: inline-block; vertical-align: middle; float: none; margin: 5px 0; } 
+    .search-box.searchCondition .formItem .calendar-item .date-picker { width: 132px; }
+    .search-box.searchCondition .formItem .calendar-item .date-picker2 { width: 132px; }
+    .time-item { width: 132px;}
+    .tableWrap { overflow:auto; } 
+    .listTable { width: 1080px; }
+    .listTable th {font-size: 13px;}    
+    .listTable td {font-size: 12px;}
+    .listTable.hologramDevice { width: 800px; } 
+    .listTable.obsrStat { width: 800px; } 
+    .listTable.seawtItrsTb { width: 800px; } 
+    .listTable.seaGroundWtItrsTb { width: 1300px; } 
+    .listTable.conSetting { width: 800px; } 
+    .listTable.conSetting button { min-width: 60px; } 
+    .listTable.apiTable { width: 800px; } 
+    .layerPop.contentsFeedback table{ width: 600px; }
+    .layerPop.permission table{ width: 600px; }
+    .layerPop.userSearch table{ width: 600px; }
+    .layerPop.conChangeEdit table{ width: 600px; }
+    .btn-wrap button { width: 40%; margin-bottom: 5px; } 
+    .cmnTabs.siteInfo > ul > li { width:50%; margin-top:-1px; } 
+    .layerPop.ycWaterObsrSearch .pop-table { width: 720px; } 
+    .layerPop.obsrSearch .colImgBox { width: 100%; height: 170px; } 
+    .phoneCrtfcCheck-area { padding: 10% 5%; } 
+    
+    .layerPop.obsrSearch .layerPop-con { height: 400px; } 
+    .layerPop.obsrSearch .layerPop-con .popTable-wrap table { width:600px; } 
+    .layerPop.obsrRegister .layerPop-con table { width:600px; } 
+    .layerPop.checkInfo .layerPop-con { height: 530px; } 
+    .layerPop.checkInfo .layerPop-con table { width:600px; } 
+    .option .pop-conTit { font-size: 15px; display: block; width: 100%; float: none; text-align: center; border: 1px solid #c7c7c7; padding: 8px; background: #ebebeb; } 
+    .option .pop-conTit + .userId { float: none; } 
+    .layerPop.alramUser table { width: 100%; font-size: 13px; } 
+    .layerPop.alramUser table button { min-width:auto; } 
+    .layerPop.obsrEdit .pop-table { width:600px; } 
+    .layerPop .layerPop-header { min-height: 50px; line-height: 50px; } 
+    .layerPop .layerPop-header strong { font-size: 18px; } 
+    .layerPop .layerPop-header button { width: 20px; height: 20px; right: 16px; } 
+    .layerPop.apiSignUp table { width:550px; } 
+    .layerPop.apiSignUp-sett table { width:550px; } 
+    
+    .loginWrap .loginLogo { width: 80%; } 
+    .loginWrap .formTit { font-size: 26px; } 
+    .joinBox .formRow .formTxt { float: none; border: 0; } 
+    .joinBox .formRow { border:0; margin: 0; } 
+    .joinBox .formRow .formTxt label { min-height: auto; line-height: unset; background: #fff; padding: 9px 0; } 
+    .joinBox .formRow.adress .formTxt label { line-height: inherit; } 
+    .joinBox .formRow .formBox { float: none; width: 100%; padding: 0; } 
+    }
+    @media(max-width: 559px){
+    .search-box select { width:99%; margin: 5px 0; } 
+    .search-box input[type="text"] {/* width:99%; */} 
+    .search-box.searchCondition .formItem { width:100%; } 
+    .search-box.searchCondition .formItem .form-tit { min-width: 80px; margin-bottom: 5px; } 
+    .search-box.searchCondition .formItem input[type="text"] { width: calc(100% - 151px); } 
+    .search-box.searchCondition .formItem select + input[type="text"] { width: 99%; } 
+    .search-box.searchCondition.loginData .formItem { width:100%; } 
+    .search-box.searchCondition.loginData .formItem input[type="text"] { width: 99%; } 
+    .search-box.searchCondition.checkSet .formItem { width:100%; } 
+    .search-box.searchCondition.checkSet .formItem select { width: 99%; } 
+    
+    .search-box.searchCondition .formItem .searchForm.search100 { width: 99%; } 
+    
+    .search-box button { width: 49%; margin-bottom:5px; } 
+    .search-box button.excelBtn {width: 99%;width: 32% !important;} 
+    .btn-group.onlySearch button {width: 20%;} 
+    .search-box button.printingBtn { width:99%; } 
+    .joinProcess ul li { width: 99%; } 
+    .joinProcess ul li > div { height: 52px; padding-top: 11px; } 
+    .joinProcess ul li > div i {height: 30px;background-size: 15px auto !important;} 
+    .joinProcess ul li > div p { font-size: 14px; } 
+    }
+    @media( max-width: 500px ){
+    .search-box .form-tit { width: 100%; margin-bottom:5px; } 
+    .search-box .searchForm { width: calc(100% - 150px); } 
+    .search-box .btn-group {margin-top:5px;text-align: center;} 
+    .search-box.searchCondition .formItem .searchForm { width: calc(100% - 160px); } 
+    .m-menu-area > ul > li> a { font-size: 14px; width: 140px; padding-left: 19px; } 
+    .m-menu-area .menuRight { left: 140px; width: calc(100% - 140px); } 
+    .m-menu-area .menuRight > ul > li > a { padding: 14px 19px; } 
+    .joinBox .formRow .formBox .birth input[type="text"] { width: 60px; } 
+    .joinForm .cmnBtn { min-width: 49%; } 
+    .layerPop.find { width:80%; } 
+    .pagination ul li{margin:5px 2px;}
+    .toggleBar {display: flex;}
+    }
+    @media( max-width: 420px ){
+    .search-box { padding: 13px 16px; } 
+    .search-box .form-tit { width: 100%; margin-bottom:5px; } 
+    .search-box .searchForm { width: calc(100% - 145px); } 
+    .header .logo { width: 253px; left: 17px; transform: translate(0, -50%); } 
+    .footer .footerLink ul li a { font-size: 14px; padding: 0 11px; } 
+    .layerPop .layerPop-header strong { font-size: 19px; } 
+    .layerPop .layerPop-header button { width: 20px; height: 20px; top: 21px; right: 18px; } 
+    .layerPop .layerPop-con { overflow:auto; } 
+    .phoneCrtfcCheck-area .phoneCrtfcCheck-box img { width: 200px; } 
+    .loginOption .join { float:none; width: 100%; text-align: center; display: block; margin-bottom: 6px; } 
+    .loginOption .findBtn { float:none; width:100%; text-align: center; } 
+    .loginWrap .loginLogo { display: none; } 
+    .loginWrap .formTit { margin-bottom: 40px; } 
+    }
+    @media( max-width: 370px ){
+    .pagination ul li a { width: 30px; height: 30px; line-height: 19px; font-size: 13px; font-weight: 300; } 
+    .pagination ul li.next a { background-position: center; } 
+    .pagination ul li.last a { background-position: center; } 
+    .m-menu-con .m-header-top p{font-size:18px;}
+    }

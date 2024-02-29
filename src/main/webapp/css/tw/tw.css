@@ -1,0 +1,212 @@
+body {
+    position: relative;
+    width: 100%;
+    background-color: #ecf0f5;
+    height: 100%;
+    overflow: hidden;
+}
+
+.layerChk {
+    margin: 0;
+    height: 18px !important;
+    width: 18px !important;
+    line-height: 18px;
+    vertical-align: middle;
+    background: #fff;
+    border: 1px solid #cccccc;
+}
+
+.layerFormLine {
+    width: 100%;
+    height: 5px;
+    background: #d2f2f5;
+    border: 1px solid #ccc;
+}
+
+.nav-pills {
+    height: 40px;
+    margin: 0;
+    padding: 0;
+    border-bottom: 1px solid #181d27;
+}
+
+.custom-nav a{
+    height: 40px;
+    line-height: 40px;
+    margin: 0;
+    padding: 0!important;
+}
+
+.nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
+    color: #fff!important;
+    background-color: #181d27!important;
+}
+
+.nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
+    border-top-color: #181d27!important;
+}
+
+.active {
+    display: block!important;
+}
+
+.tab-pane {
+    display: none;
+}
+
+.nav-link:hover {
+    background: transparent!important;
+}
+
+.input-group {
+    display: flex;
+    position: relative;
+    width: 100%;
+}
+
+.btn-dark, .btn-dark:hover, .btn-dark:focus {
+    color: #fff;
+    background-color: #343a40;
+    border-color: #343a40;
+    margin-left: -2px;
+}
+
+#addressListDiv {
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    padding-top:10px;
+    padding-bottom: 10px;
+}
+
+.noData {
+    width: 100%;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.addressObject {
+    border : 1px solid #ccc;
+    cursor: pointer;
+}
+
+.form-check-inline {
+    display: -ms-inline-flexbox;
+    display: inline-flex;
+    -ms-flex-align: center;
+    align-items: center;
+    padding-left: 0;
+    margin-right: 0.75rem;
+    float:left;
+}
+
+.form-check {
+    position: relative;
+    display: block;
+    padding-left: 1.25rem;
+}
+
+.addressObject h5, .addressObject h6 {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.addressObject h5 {
+    font-weight: 900;
+}
+
+.layerTitle {
+    font-size: 15px;
+    margin-top: 20px;
+}
+
+/*레이어 슬라이드*/
+.layer_modal_wrap {
+    position:absolute;
+    top: 0;
+    z-index: 4000;
+    height: 100%;
+    width: 350px;
+    overflow: hidden;
+    border-right: 1px #ccc solid;
+}
+.layer_modal_con {
+    position: absolute;
+    width: 350px;
+    background: #fff;
+    left: 1px;
+    overflow: scroll;
+    height: 100%;
+    padding: 10px;
+}
+.layerForm {
+    padding: 10px 20px 0 0;
+}
+.layerForm .row {
+    margin: 7px 0;
+    padding: 0 20px 0 20px;
+}
+.layerForm .row:hover {
+    background: #efefef;
+}
+.layerForm span {
+    font-size: 15px;
+    vertical-align: middle;
+    display: inline-block;
+    margin-top: 4px;
+    font-weight: 300;
+}
+.collapseIcon, .layerImg {
+    width: 18px;
+    height: 18px;
+    margin-top: 4px;
+    margin-right: 8px;
+    margin-left: 3px;
+}
+.collapsed > img.collapseIcon {
+    content: url("/images/tw/map/plus.png")!important;
+}
+
+
+/** marker list start **/
+.navyDot {
+    content: url("/images/tw/map/marker/navyDotMarker.png");
+}
+.partridgeDot {
+    content: url("/images/tw/map/marker/partridgeDotMarker.png");
+}
+
+
+/** marker list end   **/
+
+/** progress **/
+.progress-body {
+    position: fixed;
+    background: white;
+    width: calc(100% - 230px);
+    height: calc(100% - 120px);
+    z-index: 9999;
+    top:70px;
+    left:230px;
+    opacity: 0.5;
+}
+.progress-content {
+    border-radius: 20px;
+    width: 120px;
+    height: 120px;
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform: translate(-50%, -50%);
+    background: url('/images/spinner.gif');
+    background-size: cover;
+}
+.polygonSample1 {
+    fill: rgba(231, 156, 255, 0.3);
+    background: rgba(231, 156, 255, 0.3);
+    color: #a5a5a5;
+}
+.polygonSample2 {
+    fill: rgba(89, 255, 255, 0.3);
+    background: rgba(89, 255, 255, 0.3);
+    color: #a5a5a5;
+}

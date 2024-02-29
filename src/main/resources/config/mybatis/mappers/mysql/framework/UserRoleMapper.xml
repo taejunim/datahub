@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.jcms.framework.security.mapper.UserRoleMapper">
+
+	<sql id="tb"> JCMS_USER_ROLE </sql>
+	<sql id="jtb"> JCMS_USER_ROLE </sql>
+	<sql id="s">
+		SELECT USER_ID, ROLE_AUTH
+	</sql>
+	<sql id="l">
+		SELECT USER_ID, ROLE_AUTH
+	</sql>
+	<sql id="sf"> FROM <include refid="tb"/> </sql>
+	<sql id="lf"> FROM <include refid="jtb"/> </sql>
+	<sql id="sw">
+		WHERE 1 = 1
+			<if test="!empty(userId)" > AND USER_ID = #{userId} </if>
+			<if test="!empty(roleAuth)" > AND ROLE_AUTH = #{roleAuth} </if>
+	</sql>
+	<sql id="lw">
+		WHERE 1 = 1
+			<if test="!empty(userId)" > AND USER_ID = #{userId} </if>
+			<if test="!empty(roleAuth)" > AND ROLE_AUTH = #{roleAuth} </if>
+	</sql>
+	<sql id="ord">
+		<if test="!empty(sort) and !empty(sortOrd)"> ORDER BY ${sort} ${sortOrd} </if>
+		<if test="pagingYn == true"> limit #{start}, #{length} </if>
+	</sql>
+
+
+	<select id="select" parameterType="userRole" resultType="userRole">
+		<include refid="s"/>
+		<include refid="sf"/>
+		<include refid="sw"/>
+	</select>
+
+	<select id="selectList" parameterType="userRole" resultType="userRole">
+		<include refid="l"/>
+		<include refid="lf"/>
+		<include refid="lw"/>
+	</select>
+
+	<select id="selectRole" parameterType="userRole" resultType="userRole">
+		SELECT JUR.ROLE_AUTH, ROLE_NM, ROLE_DESC, USER_ID
+		FROM JCMS_ROLE JR
+			LEFT JOIN JCMS_USER_ROLE JUR
+			    ON JR.ROLE_AUTH = JUR.ROLE_AUTH
+		WHERE USER_ID = #{userId}
+	</select>
+	
+	<select id="selectRoleList" parameterType="userRole" resultType="userRole">
+		SELECT ROLE.ROLE_AUTH, ROLE.ROLE_NM, ROLE.ROLE_DESC, AUTH.USER_ID
+		FROM JCMS_ROLE ROLE
+			LEFT JOIN (
+				SELECT * FROM JCMS_USER_ROLE
+				WHERE 1 = 1
+					<if test="!empty(userId)" > AND USER_ID = #{userId} </if>
+			) AUTH
+			ON ROLE.ROLE_AUTH = AUTH.ROLE_AUTH
+		<include refid="ord"/>
+	</select>
+	
+	<select id="count" parameterType="userRole" resultType="java.lang.Integer">
+		SELECT COUNT(ROLE_AUTH)
+		FROM JCMS_ROLE
+	</select>
+	
+	<select id="existCount" parameterType="userRole" resultType="java.lang.Integer">
+		SELECT COUNT(ROLE_AUTH)
+		FROM JCMS_ROLE
+		WHERE (ROLE_AUTH = #{roleAuth} OR ROLE_NM = #{roleNm})
+	</select>
+	
+	<insert id="insert" parameterType="userRole">
+		INSERT INTO <include refid="tb"/> (
+			USER_ID, ROLE_AUTH
+		) VALUES (
+			#{userId}, #{roleAuth}
+		)
+	</insert>
+	
+	<update id="update" parameterType="userRole">
+		UPDATE <include refid="tb"/>
+		SET USER_ID = #{userId}
+			, ROLE_AUTH = #{roleAuth}
+		WHERE USER_ID = #{userId}
+	</update>
+	
+	<delete id="delete" parameterType="userRole">
+		DELETE FROM <include refid="tb"/>
+		WHERE USER_ID = #{userId}
+	</delete>
+
+</mapper>

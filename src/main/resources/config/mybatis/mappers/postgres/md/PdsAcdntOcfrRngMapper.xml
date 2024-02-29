@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.datahub.martData.mapper.PdsAcdntOcfrRngMapper">
+	<!-- ### 메크로 정의 -->
+	<sql id="tb"> datamart.pds_acdnt_ocfr_rng </sql>
+	<sql id="s"> select * </sql>
+	<sql id="sl"> select 
+		id,
+		dat_st_id,
+		crt_dt,
+		mdfcn_dt,
+		shape_id,
+		shape_id_crt_dt,
+		shape_id_mdfcn_dt,
+		ocfr_rng_id,
+		ocfr_rng_id_crt_dt,
+		ocfr_rng_id_mdfcn_dt,
+		stdg_cd,
+		brnch_cd,
+		spg_nm,
+		brnch_nm,
+		rng_info_crt_dt,
+		rng_info_mdfcn_dt,
+		acdnt_nocs,
+		calt_cnt,
+		dcsd_cnt,
+		swsn_cnt,
+		sijn_cnt,
+		inj_dcl_cnt,
+		dmge_info_crt_dt,
+		dmge_info_mdfcn_dt,
+		ocfr_rng_pyn_dat,
+		ocfr_rng_pyn_dat_crt_dt,
+		ocfr_rng_pyn_dat_mdfcn_dt,
+		ocfr_rng_lot_lat,
+		ocfr_rng_lot_lat_crt_dt,
+		ocfr_rng_lot_lat_mdfcn_dt
+	</sql>
+	<sql id="f"> from <include refid="tb"/> </sql>
+	<sql id="lw">
+		<where>
+		</where>
+	</sql>
+	<sql id="fw">
+		<where>
+			and id = #{id}
+		</where>
+	</sql>
+	<sql id="ord">
+		<if test="empty(sort)"> order by id </if>
+		<if test="!empty(sort)"> order by ${sort} </if>
+		<if test="!empty(sortOrd)"> ${sortOrd} </if>
+		<if test="pagingYn == true" > limit #{start}, #{length}	</if>
+	</sql>
+	<!-- ### Select -->
+	<select id="select" parameterType="pdsAcdntOcfrRng" resultType="pdsAcdntOcfrRng">
+		<include refid="s"/>
+		<include refid="f"/>
+		<include refid="fw"/>
+	</select>
+
+	<!-- ### selectList -->
+	<select id="selectList" parameterType="pdsAcdntOcfrRng" resultType="pdsAcdntOcfrRng">
+		<include refid="sl"/>
+		<include refid="f"/>
+		<include refid="lw"/>
+		<include refid="ord"/>
+	</select>
+	<!-- ### Count -->
+	<select id="count" parameterType="pdsAcdntOcfrRng" resultType="java.lang.Integer">
+		select COUNT(*)
+		<include refid="f"/>
+		<include refid="lw"/>
+	</select>
+	<!-- ### Insert -->
+	<insert id="insert" parameterType="pdsAcdntOcfrRng" >
+		insert into pds_acdnt_ocfr_rng (
+			id,
+			dat_st_id,
+			crt_dt,
+			mdfcn_dt,
+			shape_id,
+			shape_id_crt_dt,
+			shape_id_mdfcn_dt,
+			ocfr_rng_id,
+			ocfr_rng_id_crt_dt,
+			ocfr_rng_id_mdfcn_dt,
+			stdg_cd,
+			brnch_cd,
+			spg_nm,
+			brnch_nm,
+			rng_info_crt_dt,
+			rng_info_mdfcn_dt,
+			acdnt_nocs,
+			calt_cnt,
+			dcsd_cnt,
+			swsn_cnt,
+			sijn_cnt,
+			inj_dcl_cnt,
+			dmge_info_crt_dt,
+			dmge_info_mdfcn_dt,
+			ocfr_rng_pyn_dat,
+			ocfr_rng_pyn_dat_crt_dt,
+			ocfr_rng_pyn_dat_mdfcn_dt,
+			ocfr_rng_lot_lat,
+			ocfr_rng_lot_lat_crt_dt,
+			ocfr_rng_lot_lat_mdfcn_dt
+		) values (
+			#{id},
+			#{datStId},
+			#{crtDt},
+			#{mdfcnDt},
+			#{shapeId},
+			#{shapeIdCrtDt},
+			#{shapeIdMdfcnDt},
+			#{ocfrRngId},
+			#{ocfrRngIdCrtDt},
+			#{ocfrRngIdMdfcnDt},
+			#{stdgCd},
+			#{brnchCd},
+			#{spgNm},
+			#{brnchNm},
+			#{rngInfoCrtDt},
+			#{rngInfoMdfcnDt},
+			#{acdntNocs},
+			#{caltCnt},
+			#{dcsdCnt},
+			#{swsnCnt},
+			#{sijnCnt},
+			#{injDclCnt},
+			#{dmgeInfoCrtDt},
+			#{dmgeInfoMdfcnDt},
+			#{ocfrRngPynDat},
+			#{ocfrRngPynDatCrtDt},
+			#{ocfrRngPynDatMdfcnDt},
+			#{ocfrRngLotLat},
+			#{ocfrRngLotLatCrtDt},
+			#{ocfrRngLotLatMdfcnDt}
+		)
+	</insert>
+
+	<!-- ### update -->
+	<update id="update" parameterType="pdsAcdntOcfrRng">
+		update <include refid="tb"/> set
+			dat_st_id= #{datStId}
+			<if test="isNotNull(crtDt)" > , crt_dt= #{crtDt} </if>
+			<if test="isNotNull(mdfcnDt)" > , mdfcn_dt= #{mdfcnDt} </if>
+			<if test="isNotNull(shapeId)" > , shape_id= #{shapeId} </if>
+			<if test="isNotNull(shapeIdCrtDt)" > , shape_id_crt_dt= #{shapeIdCrtDt} </if>
+			<if test="isNotNull(shapeIdMdfcnDt)" > , shape_id_mdfcn_dt= #{shapeIdMdfcnDt} </if>
+			<if test="isNotNull(ocfrRngId)" > , ocfr_rng_id= #{ocfrRngId} </if>
+			<if test="isNotNull(ocfrRngIdCrtDt)" > , ocfr_rng_id_crt_dt= #{ocfrRngIdCrtDt} </if>
+			<if test="isNotNull(ocfrRngIdMdfcnDt)" > , ocfr_rng_id_mdfcn_dt= #{ocfrRngIdMdfcnDt} </if>
+			<if test="isNotNull(stdgCd)" > , stdg_cd= #{stdgCd} </if>
+			<if test="isNotNull(brnchCd)" > , brnch_cd= #{brnchCd} </if>
+			<if test="isNotNull(spgNm)" > , spg_nm= #{spgNm} </if>
+			<if test="isNotNull(brnchNm)" > , brnch_nm= #{brnchNm} </if>
+			<if test="isNotNull(rngInfoCrtDt)" > , rng_info_crt_dt= #{rngInfoCrtDt} </if>
+			<if test="isNotNull(rngInfoMdfcnDt)" > , rng_info_mdfcn_dt= #{rngInfoMdfcnDt} </if>
+			<if test="isNotNull(acdntNocs)" > , acdnt_nocs= #{acdntNocs} </if>
+			<if test="isNotNull(caltCnt)" > , calt_cnt= #{caltCnt} </if>
+			<if test="isNotNull(dcsdCnt)" > , dcsd_cnt= #{dcsdCnt} </if>
+			<if test="isNotNull(swsnCnt)" > , swsn_cnt= #{swsnCnt} </if>
+			<if test="isNotNull(sijnCnt)" > , sijn_cnt= #{sijnCnt} </if>
+			<if test="isNotNull(injDclCnt)" > , inj_dcl_cnt= #{injDclCnt} </if>
+			<if test="isNotNull(dmgeInfoCrtDt)" > , dmge_info_crt_dt= #{dmgeInfoCrtDt} </if>
+			<if test="isNotNull(dmgeInfoMdfcnDt)" > , dmge_info_mdfcn_dt= #{dmgeInfoMdfcnDt} </if>
+			<if test="isNotNull(ocfrRngPynDat)" > , ocfr_rng_pyn_dat= #{ocfrRngPynDat} </if>
+			<if test="isNotNull(ocfrRngPynDatCrtDt)" > , ocfr_rng_pyn_dat_crt_dt= #{ocfrRngPynDatCrtDt} </if>
+			<if test="isNotNull(ocfrRngPynDatMdfcnDt)" > , ocfr_rng_pyn_dat_mdfcn_dt= #{ocfrRngPynDatMdfcnDt} </if>
+			<if test="isNotNull(ocfrRngLotLat)" > , ocfr_rng_lot_lat= #{ocfrRngLotLat} </if>
+			<if test="isNotNull(ocfrRngLotLatCrtDt)" > , ocfr_rng_lot_lat_crt_dt= #{ocfrRngLotLatCrtDt} </if>
+			<if test="isNotNull(ocfrRngLotLatMdfcnDt)" > , ocfr_rng_lot_lat_mdfcn_dt= #{ocfrRngLotLatMdfcnDt} </if>
+			<include refid="fw"/>
+	</update>
+</mapper>

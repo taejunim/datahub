@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.3.final using JasperReports Library version 6.20.3-415f9428cffdb6805c6f85bbb29ebaf18813a2ab  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SpeedDecisionMakingReport" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="637b4e1f-b816-48ae-97be-a8e9daae8b8f">
+	<parameter name="Parameter_Address" class="java.lang.String">
+		<defaultValueExpression><![CDATA[$P{Parameter_Address}]]></defaultValueExpression>
+	</parameter>
+	<parameter name="Parameter_TrafficTime" class="java.lang.String">
+		<defaultValueExpression><![CDATA[$P{Parameter_TrafficTime}]]></defaultValueExpression>
+	</parameter>
+	<parameter name="Parameter_ReportDate" class="java.lang.String">
+		<defaultValueExpression><![CDATA[$P{Parameter_ReportDate}]]></defaultValueExpression>
+	</parameter>
+	<parameter name="Parameter_CctvCount" class="java.lang.String">
+		<defaultValueExpression><![CDATA[$P{Parameter_CctvCount}]]></defaultValueExpression>
+	</parameter>
+	<parameter name="Parameter_CrossWalkCount" class="java.lang.String">
+		<defaultValueExpression><![CDATA[$P{Parameter_CrossWalkCount}]]></defaultValueExpression>
+	</parameter>
+	<parameter name="Parameter_CrossRoadCount" class="java.lang.String">
+		<defaultValueExpression><![CDATA[$P{Parameter_CrossRoadCount}]]></defaultValueExpression>
+	</parameter>
+	<parameter name="Parameter_ChildPickupZoneCount" class="java.lang.String">
+		<defaultValueExpression><![CDATA[$P{Parameter_ChildPickupZoneCount}]]></defaultValueExpression>
+	</parameter>
+	<parameter name="Parameter_ChildWaySchoolCount" class="java.lang.String">
+		<defaultValueExpression><![CDATA[$P{Parameter_ChildWaySchoolCount}]]></defaultValueExpression>
+	</parameter>
+	<parameter name="Parameter_OneWayRoadCount" class="java.lang.String">
+		<defaultValueExpression><![CDATA[$P{Parameter_OneWayRoadCount}]]></defaultValueExpression>
+	</parameter>
+	<parameter name="Parameter_SpeedBumpCount" class="java.lang.String">
+		<defaultValueExpression><![CDATA[$P{Parameter_SpeedBumpCount}]]></defaultValueExpression>
+	</parameter>
+	<parameter name="Parameter_capture0_Image" class="java.awt.image.BufferedImage">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="Parameter_capture1_Image" class="java.awt.image.BufferedImage">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="Parameter_capture2_Image" class="java.awt.image.BufferedImage">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="Parameter_capture3_Image" class="java.awt.image.BufferedImage">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="Parameter_capture4_Image" class="java.awt.image.BufferedImage">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="802" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<staticText>
+				<reportElement x="0" y="34" width="555" height="42" uuid="3981c710-066e-4778-a2e3-f2c92a34d4eb"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="26" pdfFontName="../fonts/NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[통  행  속  도  의  사  보  고  서]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="20" y="100" width="505" height="40" uuid="ca49fbe0-9297-4a7d-8c36-1dcaf6259e92"/>
+				<textElement textAlignment="Left">
+					<font size="11" pdfFontName="../fonts/NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["위치 : " + $P{Parameter_Address}+"\n"+"기간 : " + $P{Parameter_TrafficTime}]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="120" y="138" width="320" height="150" uuid="a962938e-0a96-45ca-a4dc-0d0f381d6dd8">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<imageExpression><![CDATA[$P{Parameter_capture0_Image}]]></imageExpression>
+			</image>
+			<image>
+				<reportElement x="120" y="274" width="320" height="300" uuid="26a0db41-4d72-4422-a2b3-5eb8d51f956c">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<imageExpression><![CDATA[$P{Parameter_capture4_Image}]]></imageExpression>
+			</image>
+			<image>
+				<reportElement mode="Transparent" x="30" y="532" width="505" height="250" uuid="67329946-828d-4245-977f-874237b61d95">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<imageExpression><![CDATA[$P{Parameter_capture1_Image}]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</pageHeader>
+	<lastPageFooter>
+		<band height="802">
+			<staticText>
+				<reportElement x="187" y="680" width="180" height="30" uuid="6648c1be-9e83-4af0-8dbd-751ff49e0571"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16" pdfFontName="../fonts/NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[제 주 특 별 자 치 도]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="436" y="631" width="102" height="20" uuid="036af602-20a1-4f71-b345-3e7958db3acd"/>
+				<textElement textAlignment="Right">
+					<font size="11" pdfFontName="../fonts/NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{Parameter_ReportDate}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="377" y="650" width="60" height="20" uuid="6ada764b-d96b-4e47-8b13-867ccf3c18ae">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font size="11" pdfFontName="../fonts/NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[담 당 자 : ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="434" y="650" width="102" height="20" uuid="ee831328-ac86-4c73-8715-a59471bbfc66"/>
+				<textElement textAlignment="Right">
+					<font size="11" pdfFontName="../fonts/NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["(인)"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="137" y="590" width="280" height="20" uuid="e7301648-0124-4722-a523-35378511be26"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" pdfFontName="../fonts/NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[상기와 같이 근거하여 통행의사를 보고 드립니다.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="377" y="630" width="60" height="20" uuid="5371c303-161f-4525-ade6-1b89f525fc4e">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font size="11" pdfFontName="../fonts/NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[보 고 일 : ]]></text>
+			</staticText>
+			<image>
+				<reportElement stretchType="ContainerHeight" isPrintRepeatedValues="false" mode="Opaque" x="30" y="30" width="505" height="250" uuid="877c94ec-a137-4ef3-8643-1cf96ef2d419">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.layout.grid.weight.fixed" value="true"/>
+				</reportElement>
+				<imageExpression><![CDATA[$P{Parameter_capture2_Image}]]></imageExpression>
+			</image>
+			<image>
+				<reportElement stretchType="ContainerHeight" isPrintRepeatedValues="false" mode="Opaque" x="30" y="300" width="505" height="250" uuid="579bde22-78b0-42e3-bcd1-0ff0a720ca56">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.layout.grid.weight.fixed" value="true"/>
+				</reportElement>
+				<imageExpression><![CDATA[$P{Parameter_capture3_Image}]]></imageExpression>
+			</image>
+		</band>
+	</lastPageFooter>
+</jasperReport>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds">
+	<property resource="globals-${spring.profiles.active}.properties"/>
+	<!--
+	if 문을 사용하기 위하여 다음을 pom.xml에 추가
+			<dependency>
+			<groupId>org.codehaus.janino</groupId>
+			<artifactId>janino</artifactId>
+			<version>2.7.7</version>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.janino</groupId>
+			<artifactId>commons-compiler</artifactId>
+			<version>2.7.7</version>
+		</dependency>
+     -->
+<!-- 개발서버 반영용 -->
+	<!--<property name="LOG_PATH" value="logs/dh-web" />-->
+<!-- 운영서버 반영용 -->
+	<property name="LOG_PATH" value="/usr/local/src/logs" />
+
+	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<charset>UTF-8</charset>
+			<Pattern>[%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36}] > %msg%n</Pattern>
+		</encoder>
+	</appender>
+
+	<appender name="FILE_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_PATH}/info.log</file>
+		<encoder>
+			<charset>UTF-8</charset>
+			<pattern>[%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36}] > %msg%n</pattern>
+		</encoder>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>ERROR</level>
+			<onMatch>DENY</onMatch>
+			<onMismatch>ACCEPT</onMismatch>
+		</filter>
+
+		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_PATH}/info/info-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+			<maxHistory>30</maxHistory>
+			<maxFileSize>50MB</maxFileSize>
+			<totalSizeCap>100GB</totalSizeCap>
+		</rollingPolicy>
+	</appender>
+
+	<appender name="FILE_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_PATH}/error.log</file>
+		<encoder>
+			<charset>UTF-8</charset>
+			<pattern>[%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36}] > %msg%n</pattern>
+		</encoder>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>ERROR</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_PATH}/error/error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+			<maxHistory>30</maxHistory>
+			<maxFileSize>50MB</maxFileSize>
+			<totalSizeCap>100GB</totalSizeCap>
+		</rollingPolicy>
+	</appender>
+
+	<if condition='"${spring.profiles.active}".contains("dev")'>
+		<then>
+			<root level="DEBUG">
+				<appender-ref ref="CONSOLE" />
+				<appender-ref ref="FILE_LOG" />
+				<appender-ref ref="FILE_ERROR" />
+			</root>
+
+			<logger name="net" level="DEBUG" additivity="false">
+				<appender-ref ref="CONSOLE" />
+				<appender-ref ref="FILE_LOG" />
+				<appender-ref ref="FILE_ERROR" />
+			</logger>
+		</then>
+	</if>
+	<if condition='"${spring.profiles.active}".contains("svc")'>
+		<then>
+			<logger name="net" level="DEBUG">
+				<appender-ref ref="FILE_LOG" />
+				<appender-ref ref="FILE_ERROR" />
+			</logger>
+		</then>
+	</if>
+</configuration>

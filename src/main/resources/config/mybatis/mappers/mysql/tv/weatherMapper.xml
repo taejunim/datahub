@@ -1,0 +1,543 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.tv.weather.mapper.WeatherMapper">
+    <select id="selectWeatherStationNo" resultType="weatherModel">
+        SELECT MAX(METERING_DATE) meteringDate
+             , WEATHER_STATION_NO
+        FROM jj_weather_info
+        GROUP BY WEATHER_STATION_NO
+    </select>
+
+    <select id="getBarChartDataByCarWeather" resultType="speedDecisionMaking" parameterType="weatherModel">
+        <choose>
+            <when test='period == "month"'>
+                SELECT CONCAT(CAST(SUBSTR(meteringDate, 5, 2) AS SIGNED ), '월')  AS trafficTime
+                     , SUM(trafficCount)               AS trafficCount
+                     , weatherName                     AS type
+            </when>
+            <when test='period == "year"'>
+                SELECT CONCAT(CAST(SUBSTR(meteringDate, 1, 4) AS SIGNED ), '년')  AS trafficTime
+                , SUM(trafficCount)               AS trafficCount
+                , weatherName                     AS type
+            </when>
+            <otherwise>
+                SELECT CONCAT(CAST(SUBSTR(meteringDate, 7, 8) AS SIGNED ), '일') AS trafficTime
+                , SUM(trafficCount)               AS trafficCount
+                , weatherName                     AS type
+            </otherwise>
+        </choose>
+                FROM (
+                    SELECT statisticTable.date          meteringDate
+                         , statisticTable.weatherName   weatherName
+                         , IFNULL(a.trafficCount, 0)    trafficCount
+                    FROM (
+                        SELECT *
+                        FROM (
+                              SELECT DATE_FORMAT(DATE_ADD(#{startDate}, INTERVAL seq - 1 DAY), '%Y%m%d') AS date
+                              FROM (SELECT @num := @num + 1 AS seq
+                                    FROM information_schema.tables a
+                                       , information_schema.tables b
+                                       , (SELECT @num := 0) c
+                                   ) T
+                              WHERE seq <![CDATA[ < ]]> DATEDIFF(#{endDate}, #{startDate}) + 1
+                          ) dateTemp CROSS JOIN (SELECT CD_DTL_ID weatherType, CD_DTL_NM weatherName FROM jcms_cd_dtl WHERE CD_ID = 'weatherType') labelTable
+                    ) statisticTable LEFT OUTER JOIN (
+                        SELECT meteringDate
+                             , weatherType
+                             , SUM(trafficCount) AS trafficCount
+                        FROM (
+                            SELECT weatherTable.METERING_DATE AS meteringDate
+                                 , weatherTable.METERING_HOUR
+                                 , weatherTable.WEATHER_TYPE  AS weatherType
+                                 , trafficTable.trafficCount  AS trafficCount
+                            FROM (
+                                SELECT METERING_DATE, METERING_HOUR, WEATHER_TYPE
+                                FROM jj_weather_info
+                                WHERE METERING_DATE <![CDATA[ >= ]]> REPLACE(#{startDate}, '-', '')
+                                AND METERING_DATE <![CDATA[ < ]]> REPLACE(#{endDate}, '-', '')
+                                AND WEATHER_STATION_NO = (
+                                    SELECT WEATHER_STATION_NO
+                                    FROM (
+                                        SELECT WEATHER_STATION_NO
+                                               , ST_Distance_Sphere( ST_GeomFromText( concat('POINT(', WEATHER_STATION_LON, ' ', WEATHER_STATION_LAT, ')'), 4326)
+                                               , ST_GeomFromText('POINT(${selectedCoordinates})', 4326)) AS distance
+                                           FROM jj_weather_station
+                                           ORDER BY distance
+                                           LIMIT 1
+                                       ) a
+                                )
+                            ) weatherTable LEFT OUTER JOIN (
+                            <choose>
+                            <when test='weatherList!=null and weatherList.size!=0'>
+                                <foreach collection="weatherList" item="item" separator="UNION ALL">
+                                ${item.weatherPreparedStatement}
+                                </foreach>
+                            </when>
+                            <otherwise>
+                                SELECT '99999999' meteringDate, '00' meteringHour, 0 trafficCount
+                            </otherwise>
+                            </choose>
+                            ) trafficTable ON weatherTable.METERING_DATE = trafficTable.meteringDate AND weatherTable.METERING_HOUR = trafficTable.meteringHour
+                        ) c GROUP BY meteringDate, weatherType
+                    ) a ON statisticTable.date = a.meteringDate AND statisticTable.weatherType = a.weatherType
+                    GROUP BY statisticTable.date, statisticTable.weatherType
+                ) result
+        <choose>
+            <when test='period == "month"'>
+                GROUP BY SUBSTR(meteringDate, 1, 6), weatherName
+            </when>
+            <when test='period == "year"'>
+                GROUP BY SUBSTR(meteringDate, 1, 4), weatherName
+            </when>
+            <otherwise>
+                GROUP BY meteringDate, weatherName
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="getPieChartDataByCarWeather" resultType="speedDecisionMaking" parameterType="weatherModel">
+            SELECT code.CD_DTL_NM           AS type
+                 , IFNULL(trafficCount, 0)  AS trafficCount
+            FROM (
+                SELECT weatherTable.WEATHER_TYPE  AS weatherType
+                     , SUM(trafficCount)          AS trafficCount
+            FROM (
+                SELECT METERING_DATE, METERING_HOUR, WEATHER_TYPE
+                FROM jj_weather_info
+                WHERE METERING_DATE  <![CDATA[ >= ]]> REPLACE(#{startDate}, '-', '')
+                AND METERING_DATE <![CDATA[ < ]]> REPLACE(#{endDate}, '-', '')
+                AND WEATHER_STATION_NO = (
+                    SELECT WEATHER_STATION_NO
+                    FROM (
+                        SELECT WEATHER_STATION_NO
+                             , ST_Distance_Sphere( ST_GeomFromText( concat('POINT(', WEATHER_STATION_LON, ' ', WEATHER_STATION_LAT, ')'), 4326)
+                             , ST_GeomFromText('POINT(${selectedCoordinates})', 4326)) AS distance
+                        FROM jj_weather_station
+                        ORDER BY distance LIMIT 1
+                    ) a
+                )
+            ) weatherTable LEFT OUTER JOIN (
+        <choose>
+            <when test='weatherList!=null and weatherList.size!=0'>
+                <foreach collection="weatherList" item="item" separator="UNION ALL">
+                    ${item.weatherPreparedStatement}
+                </foreach>
+            </when>
+            <otherwise>
+                SELECT '99999999' meteringDate, '00' meteringHour, 0 trafficCount
+            </otherwise>
+        </choose>
+            ) trafficTable ON weatherTable.METERING_DATE = trafficTable.meteringDate AND weatherTable.METERING_HOUR = trafficTable.meteringHour
+            GROUP BY weatherType
+        ) c RIGHT OUTER JOIN (SELECT CD_DTL_ID, CD_DTL_NM FROM jcms_cd_dtl WHERE CD_ID = 'weatherType') code ON code.CD_DTL_ID = c.weatherType
+
+    </select>
+
+    <select id="getBarChartDataByPopulationWeatherDay" resultType="speedDecisionMaking" parameterType="weatherModel">
+        SELECT CONCAT(CAST(SUBSTR(result1.date, 7, 8) AS SIGNED ), '일') AS baseDate
+             , IFNULL(populationTraffic, 0)                             AS populationTraffic
+             , (SELECT CD_DTL_NM
+             FROM jcms_cd_dtl
+        WHERE CD_ID = 'weatherType' AND CD_DTL_ID = result1.weatherType)                  AS type
+        FROM (
+            SELECT *
+            FROM (
+                SELECT DATE_FORMAT(DATE_ADD(#{startDate}, INTERVAL seq - 1 DAY), '%Y%m%d') AS date
+                FROM (
+                    SELECT @num := @num + 1 AS seq
+                    FROM information_schema.tables a
+                       , information_schema.tables b
+                       , (SELECT @num := 0) c
+                    ) T
+                WHERE seq  <![CDATA[ < ]]>  DATEDIFF(#{endDate}, #{startDate}) + 1
+                ) dateTemp CROSS JOIN (SELECT '1' weatherType UNION ALL SELECT '2' UNION ALL SELECT '3' UNION ALL SELECT '4') labelTable
+            ) result1 LEFT OUTER JOIN (
+            SELECT meteringDate
+                 , weatherType
+                 , SUM(populationTraffic) populationTraffic
+            FROM (
+                SELECT meteringDate
+                     , weatherType
+                     , (IFNULL(populationTraffic, 0) * weatherCount) populationTraffic
+                FROM (
+                    SELECT METERING_DATE AS meteringDate
+                         , WEATHER_TYPE weatherType
+                         , type
+                         , IF(type = '1', weatherCount/3, weatherCount/5) weatherCount
+                FROM (
+                    SELECT METERING_DATE
+                         , CASE WHEN METERING_HOUR <![CDATA[ <= ]]> '12' THEN '1' WHEN METERING_HOUR > '12' THEN '2' END AS type
+                         , WEATHER_TYPE
+                         , COUNT(*)                                      weatherCount
+                    FROM jj_weather_info
+                    WHERE METERING_DATE <![CDATA[ >= ]]> REPLACE(#{startDate}, '-', '')
+                    AND METERING_DATE <![CDATA[ < ]]> REPLACE(#{endDate}, '-', '')
+                    AND WEATHER_STATION_NO = (
+                        SELECT WEATHER_STATION_NO
+                        FROM (
+                            SELECT WEATHER_STATION_NO
+                                 , ST_Distance_Sphere(ST_GeomFromText(
+                                        concat('POINT(', WEATHER_STATION_LON, ' ', WEATHER_STATION_LAT, ')'), 4326),
+                                        ST_GeomFromText('POINT(${selectedCoordinates})', 4326)) AS distance
+                            FROM jj_weather_station
+                            ORDER BY distance LIMIT 1
+                        ) a
+                     )
+                AND WEATHER_TYPE IN ('1', '2', '3', '4')
+                AND METERING_HOUR IN ('07', '09', '12', '14', '16', '18', '20', '22')
+                GROUP BY METERING_DATE, type, WEATHER_TYPE
+                ) b
+                GROUP BY meteringDate, weatherType, type
+            ) weatherTable LEFT OUTER JOIN (
+                SELECT base_date
+                     , timezn_cd
+                     , SUM(visit_pop) AS populationTraffic
+                FROM jj_spop_korn_50cell_day
+                WHERE base_date <![CDATA[ >= ]]>  REPLACE(#{startDate}, '-', '')
+                AND base_date <![CDATA[ < ]]>  REPLACE(#{endDate}, '-', '')
+                AND j_50_cd IN (
+        <choose>
+            <when test="cellId != null and cellId.size != 0">
+                <foreach collection='cellId' index='index' item='cellId' separator=','>
+                    #{cellId}
+                </foreach>
+            </when>
+            <otherwise>
+                ''
+            </otherwise>
+        </choose>
+                )
+                GROUP BY base_date, timezn_cd
+                ) b ON weatherTable.meteringDate = b.base_date AND weatherTable.type = b.timezn_cd
+            ) a
+            GROUP BY meteringDate, weatherType
+        ) result2 ON result1.date = result2.meteringDate AND result1.weatherType = result2.weatherType
+        ORDER BY result1.date
+    </select>
+
+    <select id="getBarChartDataByPopulationWeatherMonthYear" resultType="speedDecisionMaking" parameterType="weatherModel">
+        WITH RECURSIVE nrows(date) AS (
+            SELECT DATE(#{startDate})
+            UNION ALL
+        <choose>
+            <when test='period == "month"'>
+                SELECT DATE_ADD(date,INTERVAL 1 month)
+            </when>
+            <when test='period == "year"'>
+                SELECT DATE_ADD(date,INTERVAL 1 year)
+            </when>
+            <otherwise>
+                SELECT DATE_ADD(date,INTERVAL 1 month)
+            </otherwise>
+        </choose>
+            FROM nrows
+            WHERE date  <![CDATA[ < ]]>  DATE(#{endDate})
+        )
+        SELECT
+        <choose>
+            <when test='period == "month"'>
+                CONCAT(DATE_FORMAT(T2.Date, '%c'), '월') AS baseDate
+            </when>
+            <when test='period == "year"'>
+                CONCAT(DATE_FORMAT(T2.Date, '%Y'), '년') AS baseDate
+            </when>
+            <otherwise>
+                CONCAT(DATE_FORMAT(T2.Date, '%c'), '월') AS baseDate
+            </otherwise>
+        </choose>
+        , T2.type                                  AS type
+        , IFNULL(T1.populationTraffic, 0)          AS populationTraffic
+        FROM (
+            SELECT
+        <choose>
+            <when test='period == "month"'>
+                SUBSTR(DATE_FORMAT(CONCAT(base_date,'01'), '%Y-%m-%d'), 1, 7) AS baseDate
+            </when>
+            <when test='period == "year"'>
+                SUBSTR(DATE_FORMAT(CONCAT(base_date,'01'), '%Y-%m-%d'), 1, 4) AS baseDate
+            </when>
+            <otherwise>
+                SUBSTR(DATE_FORMAT(CONCAT(base_date,'01'), '%Y-%m-%d'), 1, 7) AS baseDate
+            </otherwise>
+        </choose>
+                 , (SELECT CD_DTL_NM FROM jcms_cd_dtl WHERE CD_ID = 'weatherType' AND CD_DTL_ID = weather_type) type
+                 , SUM(visit_pop) AS                                                                            populationTraffic
+            FROM jj_spop_korn_50cell_month_weather_summary
+
+            WHERE base_date  <![CDATA[ < ]]> SUBSTR(REPLACE(#{endDate},'-', ''), 1, 6)
+            AND base_date  <![CDATA[ >= ]]> SUBSTR(REPLACE(#{startDate}, '-', ''), 1, 6)
+            AND j_50_cd IN (
+        <choose>
+            <when test="cellId != null and cellId.size != 0">
+                <foreach collection='cellId' index='index' item='cellId' separator=','>
+                    #{cellId}
+                </foreach>
+            </when>
+            <otherwise>
+                ''
+            </otherwise>
+        </choose>
+            )
+            GROUP BY
+        <choose>
+            <when test='period == "month"'>
+                SUBSTR(base_date, 1, 7),
+            </when>
+            <when test='period == "year"'>
+                SUBSTR(base_date, 1, 4),
+            </when>
+            <otherwise>
+                SUBSTR(base_date, 1, 7),
+            </otherwise>
+        </choose>
+         weather_type
+        ) T1 RIGHT OUTER JOIN (
+            SELECT A1.date as date
+                 , A2.type
+            FROM nrows A1
+               , (SELECT '맑음' AS type UNION ALL SELECT '흐림' UNION ALL SELECT '비' UNION ALL SELECT '눈') A2
+            ) T2 ON
+
+        <choose>
+            <when test='period == "month"'>
+                T1.baseDate = SUBSTR(T2.Date, 1, 7) AND
+            </when>
+            <when test='period == "year"'>
+                T1.baseDate = SUBSTR(T2.Date, 1, 4) AND
+            </when>
+            <otherwise>
+                T1.baseDate = SUBSTR(T2.Date, 1, 7) AND
+            </otherwise>
+        </choose>
+            T2.type = T1.type
+        WHERE T2.Date <![CDATA[ >= ]]>   #{startDate}
+        AND T2.Date <![CDATA[ < ]]>  #{endDate}
+        ORDER BY T2.Date, T2.type
+    </select>
+
+    <select id="getPieChartDataByPopulationWeatherDay" resultType="speedDecisionMaking" parameterType="weatherModel">
+        SELECT  IFNULL(SUM(populationTraffic), 0)                                                                   AS populationTraffic
+              , (SELECT CD_DTL_NM FROM jcms_cd_dtl WHERE CD_ID = 'weatherType' AND CD_DTL_ID = result1.weatherType) AS type
+        FROM (
+            SELECT *
+            FROM (
+                SELECT DATE_FORMAT(DATE_ADD(#{startDate}, INTERVAL seq - 1 DAY), '%Y%m%d') AS date
+                FROM (
+                    SELECT @num := @num + 1 AS seq
+                    FROM information_schema.tables a
+                       , information_schema.tables b
+                       , (SELECT @num := 0) c
+                ) T
+            WHERE seq <![CDATA[ < ]]> DATEDIFF(#{endDate},#{startDate}) + 1
+            ) dateTemp CROSS JOIN (SELECT '1' weatherType UNION ALL SELECT '2' UNION ALL SELECT '3' UNION ALL SELECT '4') labelTable
+        ) result1 LEFT OUTER JOIN (
+            SELECT meteringDate
+                 , weatherType
+                 , SUM(populationTraffic) populationTraffic
+            FROM (
+                SELECT meteringDate
+                     , weatherType
+                     , (IFNULL(populationTraffic, 0) * weatherCount) populationTraffic
+                FROM (
+                    SELECT METERING_DATE AS meteringDate
+                         , WEATHER_TYPE weatherType
+                         , type
+                         , IF(type = '1', weatherCount/3, weatherCount/5) weatherCount
+                    FROM (
+                        SELECT METERING_DATE
+                             , CASE WHEN METERING_HOUR <![CDATA[ <= ]]> '12' THEN '1' WHEN METERING_HOUR <![CDATA[ > ]]> '12' THEN '2' END AS type
+                             , WEATHER_TYPE
+                             , COUNT(*)                                      weatherCount
+                        FROM jj_weather_info
+                        WHERE METERING_DATE <![CDATA[ >= ]]> REPLACE(#{startDate}, '-', '')
+                        AND METERING_DATE <![CDATA[ < ]]> REPLACE(#{endDate}, '-', '')
+                        AND WEATHER_STATION_NO = (
+                            SELECT WEATHER_STATION_NO
+                            FROM (
+                                SELECT WEATHER_STATION_NO
+                                     , ST_Distance_Sphere(ST_GeomFromText(concat('POINT(', WEATHER_STATION_LON, ' ', WEATHER_STATION_LAT, ')'), 4326),
+                                            ST_GeomFromText('POINT(${selectedCoordinates})', 4326)) AS distance
+                                FROM jj_weather_station
+                                ORDER BY distance LIMIT 1
+                            ) a
+                        )
+                    AND WEATHER_TYPE IN ('1', '2', '3', '4')
+                    AND METERING_HOUR IN ('07', '09', '12', '14', '16', '18', '20', '22')
+                    GROUP BY METERING_DATE, type, WEATHER_TYPE
+                    ) b
+                    GROUP BY meteringDate, weatherType, type
+                ) weatherTable LEFT OUTER JOIN (
+                    SELECT base_date
+                         , timezn_cd
+                         , SUM(visit_pop) AS populationTraffic
+                    FROM jj_spop_korn_50cell_day
+                    WHERE base_date <![CDATA[ >= ]]> REPLACE(#{startDate}, '-', '')
+                    AND base_date <![CDATA[ < ]]> REPLACE(#{endDate}, '-', '')
+                    AND j_50_cd IN (
+                    <choose>
+                        <when test="cellId != null and cellId.size != 0">
+                            <foreach collection='cellId' index='index' item='cellId' separator=','>
+                                #{cellId}
+                            </foreach>
+                        </when>
+                        <otherwise>
+                            ''
+                        </otherwise>
+                    </choose>
+                    )
+                    GROUP BY base_date, timezn_cd
+                ) b ON weatherTable.meteringDate = b.base_date AND weatherTable.type = b.timezn_cd
+            ) a
+            GROUP BY meteringDate, weatherType
+        ) result2 ON result1.date = result2.meteringDate AND result1.weatherType = result2.weatherType
+        GROUP BY result1.weatherType
+    </select>
+    <select id="getPieChartDataByPopulationWeatherMonthYear" resultType="speedDecisionMaking" parameterType="weatherModel">
+        SELECT COALESCE(T2.type, '-')                        AS type
+             , COALESCE(T1.populationTraffic, 0)             AS populationTraffic
+        FROM (
+            SELECT (SELECT CD_DTL_NM FROM jcms_cd_dtl WHERE CD_ID = 'weatherType' AND CD_DTL_ID = weather_type) AS type
+                  , SUM(visit_pop) AS populationTraffic
+            FROM jj_spop_korn_50cell_month_weather_summary
+            WHERE base_date  <![CDATA[ >= ]]>  SUBSTR(REPLACE(#{startDate}, '-', ''), 1,6)
+            AND base_date  <![CDATA[ < ]]> SUBSTR(REPLACE(#{endDate}, '-', ''), 1,6)
+            AND j_50_cd IN (
+        <choose>
+            <when test="cellId != null and cellId.size != 0">
+                <foreach collection='cellId' index='index' item='cellId' separator=','>
+                    #{cellId}
+                </foreach>
+            </when>
+            <otherwise>
+                ''
+            </otherwise>
+        </choose>
+                )
+            GROUP BY type
+            ) T1 RIGHT OUTER JOIN (
+                select CD_DTL_NM as type FROM jcms_cd_dtl WHERE CD_ID = 'weatherType'
+            ) T2 ON T1.type = T2.type
+    </select>
+
+    <select id="getDataByWeatherYearMonthDay" resultType="weatherModel" parameterType="speedDecisionMaking">
+        SELECT
+            (SELECT C.CD_DTL_NM FROM jcms_cd_dtl C WHERE C.CD_DTL_ID = B.WEATHER_TYPE AND C.CD_ID = 'weatherType')  AS weatherType
+             , COUNT(b.WEATHER_TYPE)                                                                                AS count
+             , A.WEATHER_STATION_NO                                                                                 AS weatherStationNo
+        FROM jj_weather_station A
+        JOIN jj_weather_info B
+        ON A.WEATHER_STATION_NO = B.WEATHER_STATION_NO
+        WHERE A.WEATHER_STATION_NO = (
+            SELECT WEATHER_STATION_NO FROM (
+                                               SELECT WEATHER_STATION_NO
+                                                    ,ST_Distance_Sphere( ST_GeomFromText( concat('POINT(', AA.WEATHER_STATION_LON, ' ', AA.WEATHER_STATION_LAT, ')'), 4326)
+                                                    ,ST_GeomFromText('POINT(${selectedCoordinates})', 4326)) as distance
+                                               FROM
+                                                   jj_weather_station AA
+                                               order by distance
+                                                   LIMIT 1  -- 선택된 지역에서 가까운 관측소 찾기
+                                           ) AAA
+        )
+
+          <choose>
+          <when test='period == "year"'>
+              AND DATE_FORMAT(B.METERING_DATE,'%Y')  <![CDATA[ >= ]]> SUBSTR(REPLACE(#{startDate}, '-', '-'),1,4)
+              AND DATE_FORMAT(B.METERING_DATE,'%Y')  <![CDATA[ < ]]>  SUBSTR(REPLACE(#{endDate}, '-', '-'),1,4)
+          </when>
+          <when test='period == "month"'>
+              AND DATE_FORMAT(B.METERING_DATE,'%Y') = SUBSTR(REPLACE(#{startDate},'-','-'),1,4)
+              AND DATE_FORMAT(B.METERING_DATE,'%m')  <![CDATA[ >= ]]> SUBSTR(REPLACE(#{startDate}, '-', '-'),6,2)
+              AND DATE_FORMAT(B.METERING_DATE,'%m')  <![CDATA[ < ]]>  SUBSTR(REPLACE(#{endDate}, '-', '-'),6,2)
+          </when>
+          <otherwise>
+              AND B.METERING_DATE  <![CDATA[ >= ]]> REPLACE(#{startDate}, '-', '')
+              AND B.METERING_DATE  <![CDATA[ < ]]>  REPLACE(#{endDate}, '-', '')
+          </otherwise>
+          </choose>
+        GROUP BY B.WEATHER_TYPE
+    </select>
+
+    <insert id="insertWeatherHistory" parameterType="weatherModel">
+        INSERT INTO jj_weather_info(WEATHER_INFO_NO, METERING_DATE, METERING_HOUR, WEATHER_STATION_NO, WEATHER_TYPE, TEMPERATURE, WIND_SPEED, WIND_TYPE, REG_DT)
+        VALUES
+        <foreach collection="list" item="item" separator="," index="index">
+           ( (SELECT CONCAT('wth', DATE_FORMAT(SYSDATE(), '%Y%m%d%H%i%s')
+           , LPAD(${index}, 2,'0')))
+           , #{item.meteringDate}
+           , #{item.meteringHour}
+           , #{item.weatherStationNo}
+           , #{item.weatherType}
+           , #{item.temperature}
+           , #{item.windSpeed}
+           , #{item.windType}
+           , SYSDATE())
+        </foreach>
+    </insert>
+
+    <insert id="insertWeatherSummaryCount" parameterType="hashMap">
+
+        INSERT INTO jj_spop_korn_50cell_month_weather_summary(base_date, j_50_cd, weather_type, visit_pop)
+
+        SELECT *
+            FROM (
+                SELECT labelTable.baseDate AS basedate
+                     , labelTable.cellId AS cellId
+                     , labelTable.weatherType AS weatherType
+                     , IFNULL(a.visitPop, 0) AS visitPop
+                FROM (
+                    SELECT *
+                    FROM (
+        <foreach collection="cellList" item="item" separator="UNION ALL">
+        SELECT SUBSTR(#{startDate}, 1, 6) baseDate,  #{item.cellId} cellId
+        </foreach>
+                    ) allTable CROSS JOIN (SELECT '1' AS weatherType UNION ALL SELECT '2' UNION ALL SELECT '3' UNION ALL SELECT '4') b
+                ) labelTable LEFT OUTER JOIN (
+                    SELECT SUBSTR(base_date, 1, 6) baseDate
+                         , j_50_cd
+                         , weatherType
+                         , SUM(visitPop) AS        visitPop
+                    FROM (
+                        SELECT base_date
+                             , j_50_cd
+                             , IF(timezn_cd = '1', visitPop * (IFNULL(weatherCount, 0) / 3), visitPop * (IFNULL(weatherCount, 0) / 5)) AS visitPop
+                             , weatherType
+                             , weatherCount
+                        FROM (
+                            SELECT base_date, j_50_cd, timezn_cd, visitPop, weatherType
+                            FROM (
+                                SELECT base_date, timezn_cd, j_50_cd, visitPop
+                                FROM (
+                                    SELECT base_date, timezn_cd, j_50_cd, SUM(visit_pop) visitPop
+                                    FROM jj_spop_korn_50cell_day
+                                    WHERE base_date <![CDATA[ >= ]]> #{startDate}
+                                    AND base_date <![CDATA[ < ]]> #{endDate}
+                                    AND j_50_cd IN (
+                                <foreach collection="cellList" item="item" separator="," >
+                                    #{item.cellId}
+                                </foreach>
+                                    )
+                                    GROUP BY base_date, timezn_cd, j_50_cd
+                                ) a
+                            ) a CROSS JOIN (SELECT '1' AS weatherType UNION ALL SELECT '2' UNION ALL SELECT '3' UNION ALL SELECT '4') b
+                        ) result1 LEFT OUTER JOIN (
+                            SELECT METERING_DATE
+                                 , CASE WHEN METERING_HOUR <![CDATA[ <= ]]> '12' THEN '1' WHEN METERING_HOUR <![CDATA[ > ]]> '12' THEN '2' END AS type
+                                 , WEATHER_TYPE
+                                 , COUNT(*)                                                                           weatherCount
+                            FROM jj_weather_info
+                            WHERE METERING_DATE <![CDATA[ >= ]]> REPLACE(#{startDate}, '-', '')
+                            AND METERING_DATE <![CDATA[ < ]]> REPLACE(#{endDate}, '-', '')
+                            AND WEATHER_STATION_NO = #{weatherStationNo}
+                            AND WEATHER_TYPE IN ('1', '2', '3', '4')
+                            AND METERING_HOUR IN ('07', '09', '12', '14', '16', '18', '20', '22')
+                            GROUP BY METERING_DATE, type, WEATHER_TYPE
+                        ) result2 ON result1.base_date = result2.METERING_DATE AND result1.timezn_cd = result2.type AND  result1.weatherType = result2.WEATHER_TYPE
+                    ) result
+                    GROUP BY baseDate, j_50_cd, weatherType
+                ) AS a ON labelTable.baseDate = a.baseDate AND labelTable.cellId = a.j_50_cd AND labelTable.weatherType = a.weatherType
+            ) AS b
+        ON DUPLICATE KEY UPDATE
+        visit_pop = visitPop
+    </insert>
+</mapper>

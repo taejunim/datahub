@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.jcms.framework.security.mapper.RoleMapper">
+
+	<sql id="tb"> JCMS_ROLE </sql>
+	<sql id="jtb"> JCMS_ROLE </sql>
+	<sql id="s"> SELECT * </sql>
+	<sql id="l">
+		SELECT ROLE_AUTH, ROLE_NM, ROLE_DESC
+	</sql>
+	<sql id="sf"> FROM <include refid="tb"/> </sql>
+	<sql id="lf"> FROM <include refid="jtb"/> </sql>
+	<sql id="sw">
+		WHERE 1 = 1
+	</sql>
+	<sql id="lw">
+		WHERE 1 = 1
+		<if test="!empty(roleAuthLike)"> AND ROLE_AUTH LIKE CONCAT('%', #{roleAuthLike}, '%') </if>
+	</sql>
+	<sql id="ord">
+		<if test="!empty(sort) and !empty(sortOrd)"> ORDER BY ${sort} ${sortOrd}</if>
+		<if test="pagingYn == true"> limit #{start}, #{length} </if>
+	</sql>
+
+
+	<select id="selectList" parameterType="role" resultType="role">
+		<include refid="l"/>
+		<include refid="lf"/>
+		<include refid="lw"/>
+		<include refid="ord"/>
+	</select>
+
+	<select id="count" parameterType="role" resultType="java.lang.Integer">
+		SELECT COUNT(ROLE_AUTH)
+		<include refid="lf"/>
+		<include refid="lw"/>
+	</select>
+
+	<select id="existCount" parameterType="role" resultType="java.lang.Integer">
+		SELECT COUNT(ROLE_AUTH)
+		<include refid="sf"/>
+		WHERE (ROLE_AUTH = #{roleAuth} OR ROLE_NM = #{roleNm})
+	</select>
+
+	<insert id="insert" parameterType="role">
+		INSERT INTO <include refid="tb"/> (
+			ROLE_AUTH, ROLE_NM, ROLE_DESC, REG_ID, REG_DT
+		) VALUES (
+			#{roleAuth}, #{roleNm}, #{roleDesc}, #{regId}, SYSDATE()
+		)
+	</insert>
+
+	<update id="update" parameterType="role">
+		UPDATE <include refid="tb"/>
+		SET <include refid="BaseSql.Update"/>
+			, ROLE_NM = #{roleNm}
+			, ROLE_DESC = #{roleDesc}
+		WHERE ROLE_AUTH = #{roleAuth}
+	</update>
+
+	<delete id="delete" parameterType="role">
+		DELETE FROM <include refid="tb"/>
+		WHERE ROLE_AUTH = #{roleAuth}
+			AND ROLE_NM =#{roleNm}
+	</delete>
+
+</mapper>

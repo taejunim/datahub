@@ -1,0 +1,561 @@
+.chartdiv {
+    width: 100%;
+    height: 100%;
+    /*margin-bottom: 30px;*/
+}
+
+.pieChartdiv {
+    height: 100%;
+    position: relative;
+}
+
+.pieModalChartDiv {
+    height: 100%;
+    position: relative;
+}
+
+.chartpie {
+    height: 100%;
+    position: relative;
+}
+
+.chart-wrapper {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 2px;
+    /*margin-bottom: 20px;*/
+}
+
+.loc-wordcloud-acc-vs {
+    display: flex;
+}
+
+.time-lchart-acc-vs {
+    display: flex;
+    justify-content: space-between;
+}
+
+.loc-wordcloud-usage-vs {
+    display: flex;
+}
+
+.operator-bchart-usage-vs {
+    display: flex;
+    justify-content: space-between;
+}
+
+.left-chart-div {
+    display: flex;
+    flex: 1;
+    align-items: center;
+}
+
+.right-chart-div {
+    flex: 2;
+}
+
+.chart-div {
+    flex: 1;
+}
+
+.loc-lchart-div {
+    flex: 3;
+}
+
+.time-lchart-acc-wrapper {
+    flex: 1;
+}
+
+.time-lchart-usage-wrapper {
+    flex: 3;
+}
+
+.dow-bchart-acc-wrapper {
+    flex: 1;
+}
+
+.operator-bchart-usage-wrapper {
+    flex: 2;
+}
+
+.comb-bheatmap-usage-wrapper {
+    flex: 3;
+}
+
+.dow-bchart-usage-wrapper {
+    flex: 2;
+}
+
+.div-inner {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.no-data {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.exportdiv {
+    width: 100%;
+    height: 40px;
+    border-bottom: 1px solid #eee;
+}
+
+.custom-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px !important;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+    background-color: #eff0f1;
+}
+.custom-modal-title {
+    font-size: 23px;
+}
+.custom-close {
+    color: #aaa;
+    float: right;
+    font-weight: bold;
+    font-size: 23px;
+    line-height: 1;
+    border: none;
+}
+.custom-close:hover {
+    cursor: pointer;
+    color: #000;
+    text-decoration: none;
+}
+.custom-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 16px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    background-color: #eff0f1;
+}
+.custom-modal-body {
+    padding: 0px;
+}
+.custom-modal-lg {
+    max-width: 810px;
+}
+.custom-modal {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+.custom-modal-content {
+    width: 100%;
+}
+.custom-modal-dialog {
+    position: relative;
+    margin: 30px auto;
+    max-width: 55%;
+}
+.custom-modal-none {
+    opacity: 0;
+    z-index: -999;
+}
+.custom-modal-show {
+    opacity: 1;
+    z-index: 9999;
+}
+
+/*chart*/
+.chart-header {
+    color: #444;
+    padding: 3px 10px;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 42px;
+}
+
+.chart-header-option {
+    color: #444;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-right: 10px;
+    height: 100%;
+}
+
+.btn-group :not(button:last-child) {
+    margin-right: 15px;
+}
+
+.chart-header-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.chart-header-subwrapper {
+    display: flex;
+    flex-direction: row;
+}
+
+.chart-header-title {
+    display: inline-block;
+    font-size: 18px;
+    margin: 0;
+    line-height: 0;
+}
+
+.chart-header-title-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.chart-header-search-wrapper {
+    gap: 50px;
+    display: flex;
+}
+
+#vw-notice {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: 9999;
+    color: red;
+    font-size: 20px;
+    display: none;
+    background-color: rgba(255, 255, 255, 0.5);
+    padding: 15px 15px;
+}
+
+/*legend*/
+#legend {
+    position: absolute;
+    z-index: 100;
+    left: 600px;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.5);
+    padding: 10px 10px;
+    display: flex;
+    flex-direction: column;
+    display: none;
+    transition: all ease 1s;
+    width: 110px;
+    height: 72px;
+}
+
+.dtllnkg-legend-container {
+    display: none;
+    transition: all ease 1s;
+    position: absolute;
+    z-index: 100;
+    left: 600px;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.5);
+    padding: 10px 10px;
+    width: 110px;
+}
+
+#dtllnkg-legend {
+    display: flex;
+    flex-direction: column;
+}
+
+.dtllnkg-move {
+    position: absolute;
+    bottom: 72px;
+}
+
+.square-box {
+    display: flex;
+}
+
+.square-box-box {
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+}
+
+.blue-square {
+    width: 10px;
+    height: 10px;
+    background-color: blue;
+}
+
+.green-square {
+    width: 10px;
+    height: 10px;
+    background-color: green;
+}
+
+.red-square {
+    width: 10px;
+    height: 10px;
+    background-color: red;
+}
+
+/*range*/
+.gis-range-wrapper {
+    width: 625px;
+    position: absolute;
+    z-index: 100;
+    left: 615px;
+    top: 72px;
+    background-color: rgba(255, 255, 255, 0.5);
+    height: 52px;
+    padding: 0 5px 0 20px;
+    display: none;
+    transition: all ease 1s;
+}
+
+.gis-range {
+    position: relative;
+    width: 600px;
+}
+
+.gis-range input {
+    width: 100%;
+    position: absolute;
+    top: 2px;
+    height: 0;
+    -webkit-appearance: none;
+}
+
+/*.gis-range input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    margin: -8px 0 0;
+    border-radius: 50%;
+    background: #37adbf;
+    cursor: pointer;
+    border: 0 !important;
+}
+
+.gis-range input::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    margin: -8px 0 0;
+    border-radius: 50%;
+    background: #37adbf;
+    cursor: pointer;
+    border: 0 !important;
+}
+
+.gis-range input::-ms-thumb {
+    width: 18px;
+    height: 18px;
+    margin: -8px 0 0;
+    border-radius: 50%;
+    background: #37adbf;
+    cursor: pointer;
+    border: 0 !important;
+}
+
+.gis-range input::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 2px;
+    cursor: pointer;
+    background: #b2b2b2;
+}
+
+.gis-range input::-moz-range-track {
+    width: 100%;
+    height: 2px;
+    cursor: pointer;
+    background: #b2b2b2;
+}
+
+.gis-range input::-ms-track {
+    width: 100%;
+    height: 2px;
+    cursor: pointer;
+    background: #b2b2b2;
+}*/
+
+.gis-range input:focus {
+    background: none;
+    outline: none;
+}
+
+.gis-range input::-ms-track {
+    width: 100%;
+    cursor: pointer;
+    background: transparent;
+    border-color: transparent;
+    color: transparent;
+}
+
+.range-labels {
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.range-labels li {
+    position: relative;
+    float: left;
+    width: 25px;
+    text-align: center;
+    color: #000000;
+    font-size: 8px;
+    cursor: pointer;
+}
+
+.range-labels li::before {
+    position: absolute;
+    top: -17px;
+    right: 0;
+    left: 0;
+    content: "";
+    margin: 0 auto;
+    width: 9px;
+    height: 9px;
+    background: #000000;
+    border-radius: 50%;
+}
+
+.range-labels .active {
+    color: #00ff00;
+}
+
+.range-labels .selected::before {
+    background: #00ff00;
+}
+
+.range-labels .active.selected::before {
+    display: none;
+}
+
+.option-style {
+    height: 80%;
+    padding: 5px;
+    border-radius: 10px;
+}
+
+.ill-pk-wrapper {
+    height: 34px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.ill-pk-cell {
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+table.dataTable tbody > tr > td {
+    background-color: transparent;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #e0f3ff;
+}
+
+.dataTables_scrollHead th {
+    text-align: center;
+}
+
+.popup-wrapper {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    width: 250px;
+    text-align: center;
+    background: #fff;
+    z-index: 1000;
+    border-radius: 10px;
+    padding: 15px 10px;
+    font-weight: bold;
+    display: none;
+}
+
+.glayout {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    height: 100%;
+}
+
+.graph-frame {
+    height: calc(100vh - 70px);
+}
+
+.graph-main-frame {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.flex1 {
+    flex: 1;
+}
+
+.graph-section {
+    padding: 0 10px 0 10px;
+    height: 100%;
+}
+
+.graph-calc-height {
+    height: 100%;
+}
+
+/*.zoom-icon {
+    font-size: 25px !important;
+    cursor: pointer;
+    padding-top: 0 !important;
+}*/
+
+.zoom-icon:hover {
+    color: grey;
+}
+
+.material-icons-wrapper {
+    display: flex;
+    align-items: center;
+    padding-right: 3px;
+}
+
+#first-chart {
+    width: 100%;
+    height: 100%;
+}
+
+.second-chart-show {
+    width: 100%;
+    height: 50% !important;
+}
+
+.first-chart-half {
+    height: 50% !important;
+}
+
+.reset-bar {
+    position: relative;
+    margin-right: 30px !important;
+}
+
+.reset-bar::after {
+    position: absolute;
+    left: calc(100% + 16px);
+    top: 3px;
+    content: "";
+    width: 2px;
+    height: calc(100% - 6px);
+    background-color: grey;
+}

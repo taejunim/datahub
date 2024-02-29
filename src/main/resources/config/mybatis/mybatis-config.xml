@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+		<setting name="cacheEnabled" value="true" />
+		<setting name="lazyLoadingEnabled" value="true" />
+		<setting name="mapUnderscoreToCamelCase" value="true" />
+		<setting name="defaultExecutorType" value="SIMPLE" />
+		<setting name="defaultStatementTimeout" value="25" />
+		<setting name="localCacheScope" value="SESSION" />
+		<setting name="jdbcTypeForNull" value="NULL" />
+	</settings>
+	<typeAliases>
+		<typeAlias alias="cmsMenuConnHist" type="net.jcms.framework.menu.model.MenuConnHist" />
+		<typeAlias alias="cmsMenuConnHistSearch" type="net.jcms.framework.menu.model.MenuConnHistSearch" />
+
+		<typeAlias alias="user" type="net.jcms.framework.security.model.User" />
+		<typeAlias alias="userSearch" type="net.jcms.framework.security.model.UserSearch" />
+		<typeAlias alias="role" type="net.jcms.framework.security.model.Role"/>
+		<typeAlias alias="userRole" type="net.jcms.framework.security.model.UserRole"/>
+		<typeAlias alias="scurRsc" type="net.jcms.framework.security.model.ScurRsc" />
+		<typeAlias alias="scurRscRole" type="net.jcms.framework.security.model.ScurRscRole" />
+		<typeAlias alias="loginLog" type="net.jcms.framework.security.model.LoginLog" />
+		<typeAlias alias="loginLogSearch" type="net.jcms.framework.security.model.LoginLogSearch" />
+		<typeAlias alias="menu" type="net.jcms.framework.menu.model.Menu" />
+		<typeAlias alias="menuSearch" type="net.jcms.framework.menu.model.MenuSearch" />
+		<typeAlias alias="menuRole" type="net.jcms.framework.menu.model.MenuRole" />
+		<typeAlias alias="menuRoleSearch" type="net.jcms.framework.menu.model.MenuRoleSearch" />
+		<typeAlias alias="pgm" type="net.jcms.framework.pgm.model.Pgm" />
+		<typeAlias alias="pgmSearch" type="net.jcms.framework.pgm.model.PgmSearch" />
+		<typeAlias alias="cd" type="net.jcms.framework.cd.model.Cd" />
+		<typeAlias alias="cdCls" type="net.jcms.framework.cd.model.CdCls" />
+		<typeAlias alias="cdDtl" type="net.jcms.framework.cd.model.CdDtl" />
+		<typeAlias alias="file" type="net.jcms.framework.file.model.FileInfo" />
+		<typeAlias alias="fileSearch" type="net.jcms.framework.file.model.FileSearch" />
+		<typeAlias alias="fileItem" type="net.jcms.framework.file.model.FileItem" />
+		<typeAlias alias="fileItemSearch" type="net.jcms.framework.file.model.FileItemSearch" />
+		<typeAlias alias="webLog" type="net.jcms.framework.weblog.model.WebLog" />
+		<typeAlias alias="webLogSearch" type="net.jcms.framework.weblog.model.WebLogSearch" />
+
+		<typeAlias alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+
+		<!-- PM DTO DATA -->
+		<typeAlias alias="pmAcdntRcptInfoRequestDto" type="net.pm.dto.PmAcdntRcptInfoRequestDto" />
+		<typeAlias alias="pmLendRtnHstryRequestDto" type="net.pm.dto.PmLendRtnHstryRequestDto" />
+		<typeAlias alias="martLendRtnHstry" type="net.datahub.martLendRtnHstry.model.MartLendRtnHstry" />
+		<typeAlias alias="martAcdntRcptInfo" type="net.datahub.martAcdntRcptInfo.model.MartAcdntRcptInfo" />
+		<typeAlias alias="martTrnsAcdntOcrnBrnch" type="net.datahub.martTrnsAcdntOcrnBrnch.model.MartTrnsAcdntOcrnBrnch" />
+
+		<!-- PM MODEL DATA -->
+		<typeAlias alias="pmAcdntRcptInfo" type="net.pm.model.PmAcdntRcptInfo" />
+		<typeAlias alias="pmLendRtnHstry" type="net.pm.model.PmLendRtnHstry" />
+		<typeAlias alias="gInfra" type="net.pm.model.GInfra" />
+		<typeAlias alias="lendRtnHstry" type="net.pm.model.LendRtnHstry" />
+		<typeAlias alias="pmAccSearch" type="net.pm.model.PmAccSearch" />
+		<typeAlias alias="pmDrivingSearch" type="net.pm.model.PmDrivingSearch" />
+		<typeAlias alias="acdntRcptInfo" type="net.pm.model.AcdntRcptInfo" />
+
+		<!-- WEATHER MODEL DATA -->
+		<typeAlias alias="weatherModel" type="net.tv.weather.model.WeatherModel" />
+		<typeAlias alias="weatherSummaryModel" type="net.tv.weather.model.WeatherSummaryModel" />
+
+		<!-- DATAHUB MODEL DATA -->
+		<typeAlias alias="speedDecisionMaking" type="net.tv.protectionZone.model.SpeedDecisionMaking" />
+		<typeAlias alias="tvCommonSearchCondition" type="net.datahub.tv.common.model.TvCommonSearchCondition"/>
+
+		<typeAlias alias="pdsAcdntOcfrRng" type="net.datahub.martData.model.PdsAcdntOcfrRng"/>
+		<typeAlias alias="twhAcdntOcfrRng" type="net.datahub.martData.model.TwhAcdntOcfrRng"/>
+		<typeAlias alias="dtlLnkgRoadRiskIdx" type="net.datahub.martData.model.DtlLnkgRoadRiskIdx"/>
+		<typeAlias alias="lnkgBaseAcdntRiskRng" type="net.datahub.martData.model.LnkgBaseAcdntRiskRng"/>
+		<typeAlias alias="dthTrnsAcdntRngInfo" type="net.datahub.martData.model.DthTrnsAcdntRngInfo"/>
+		<typeAlias alias="bcclAcdntOcfrRng" type="net.datahub.martData.model.BcclAcdntOcfrRng"/>
+		<typeAlias alias="walkEldAcdntOcfrRng" type="net.datahub.martData.model.WalkEldAcdntOcfrRng"/>
+		<typeAlias alias="walkCldAcdntOcfrRng" type="net.datahub.martData.model.WalkCldAcdntOcfrRng"/>
+		<typeAlias alias="schzoneCldAcdntOcfrRng" type="net.datahub.martData.model.SchzoneCldAcdntOcfrRng"/>
+		<typeAlias alias="pdsWtmsCrsAcdntOcfrRng" type="net.datahub.martData.model.PdsWtmsCrsAcdntOcfrRng"/>
+	</typeAliases>
+</configuration>

@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.pm.mapper.PmLendRtnHstryMapper">
+    <insert id="insertPmLendRtnHstry" parameterType="java.util.List">
+        INSERT IGNORE INTO pm_lend_rtn_hstry (
+             id
+           , oper
+           , pm_type
+           , mbr_no
+           , kckbrd_id
+           , lend_dt
+           , spoint_x
+           , spoint_y
+           , rent_spot
+           , rtn_dt
+           , epoint_x
+           , epoint_y
+           , return_spot
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+          (
+            #{item.id}
+          , #{item.oper}
+          , #{item.pm_type}
+          , #{item.mbr_no}
+          , #{item.kckbrd_id}
+          , #{item.lend_dt}
+          , #{item.spoint_x}
+          , #{item.spoint_y}
+          , #{item.rent_spot}
+          , #{item.rtn_dt}
+          , #{item.epoint_x}
+          , #{item.epoint_y}
+          , #{item.return_spot}
+          )
+        </foreach>
+    </insert>
+
+    <select id="selectPmLendRtnHstryListByFilter" parameterType="pmLendRtnHstryRequestDto" resultType="pmLendRtnHstry">
+        SELECT
+        a.ID AS id
+        , a.OPER AS oper
+        , a.PM_TYPE AS pm_type
+        , a.MBR_NO AS mbr_no
+        , a.KCKBRD_ID AS kckbrd_id
+        , a.LEND_DT AS lend_dt
+        , a.SPOINT_X AS spoint_x
+        , a.SPOINT_Y AS spoint_y
+        , a.RENT_SPOT AS rent_spot
+        , a.RTN_DT AS rtn_dt
+        , a.EPOINT_X AS epoint_x
+        , a.EPOINT_Y AS epoint_y
+        , a.RETURN_SPOT AS return_spot
+        , a.ILLE_PARK AS ille_park
+        FROM pm_lend_rtn_hstry AS a
+        <where>
+            1=1
+            <if test="operator != null and operator != ''">
+                <choose>
+                    <when test="operator == 'none'">
+                        AND oper is null
+                    </when>
+                    <otherwise>
+                        AND oper = #{operator}
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="isIPChecked != null">
+                <if test="isIPChecked">
+                    AND ille_park = 1
+                </if>
+            </if>
+            <choose>
+                <when test="retf != null and retf == 'rent'">
+                    <if test="startSearchDt != null and endSearchDt != null">
+                        AND lend_dt BETWEEN #{startSearchDt} AND #{endSearchDt}
+                    </if>
+                    <![CDATA[ ORDER BY lend_dt DESC ]]>
+                </when>
+                <when test="retf != null and retf == 'return'">
+                    <if test="startSearchDt != null and endSearchDt != null">
+                        AND rtn_dt BETWEEN #{startSearchDt} AND #{endSearchDt}
+                    </if>
+                    <![CDATA[ ORDER BY rtn_dt DESC ]]>
+                </when>
+                <otherwise>
+                    <if test="startSearchDt != null and endSearchDt != null">
+                        AND rtn_dt BETWEEN #{startSearchDt} AND #{endSearchDt}
+                        AND lend_dt BETWEEN #{startSearchDt} AND #{endSearchDt}
+                    </if>
+                </otherwise>
+            </choose>
+        </where>
+        <if test="null!=sort and null!=sortOrd"> order by ${sort} ${sortOrd} </if>
+        <if test="pagingYn == true and start != null and length != null" >
+            limit #{start}, #{length}
+        </if>
+    </select>
+
+    <select id="countPmLendRtnHstryListByFilter" parameterType="pmLendRtnHstryRequestDto" resultType="java.lang.Integer">
+        SELECT COUNT( * )
+        FROM pm_lend_rtn_hstry
+        <where>
+            1=1
+            <if test="operator != null and operator != ''">
+                <choose>
+                    <when test="operator == 'none'">
+                        AND oper is null
+                    </when>
+                    <otherwise>
+                        AND oper = #{operator}
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="isIPChecked != null">
+                <if test="isIPChecked">
+                    AND ille_park = 1
+                </if>
+            </if>
+            <choose>
+                <when test="retf != null and retf == 'rent'">
+                    <if test="startSearchDt != null and endSearchDt != null">
+                        AND lend_dt BETWEEN #{startSearchDt} AND #{endSearchDt}
+                    </if>
+                    <![CDATA[ ORDER BY lend_dt DESC ]]>
+                </when>
+                <when test="retf != null and retf == 'return'">
+                    <if test="startSearchDt != null and endSearchDt != null">
+                        AND rtn_dt BETWEEN #{startSearchDt} AND #{endSearchDt}
+                    </if>
+                    <![CDATA[ ORDER BY rtn_dt DESC ]]>
+                </when>
+                <otherwise>
+                    <if test="startSearchDt != null and endSearchDt != null">
+                        AND rtn_dt BETWEEN #{startSearchDt} AND #{endSearchDt}
+                        AND lend_dt BETWEEN #{startSearchDt} AND #{endSearchDt}
+                    </if>
+                </otherwise>
+            </choose>
+        </where>
+    </select>
+
+    <select id="selectPmLendRtnHstryList" parameterType="pmLendRtnHstry" resultType="pmLendRtnHstry">
+        SELECT
+          a.ID AS id
+        , a.OPER AS oper
+        , a.PM_TYPE AS pm_type
+        , a.MBR_NO AS mbr_no
+        , a.KCKBRD_ID AS kckbrd_id
+        , a.LEND_DT AS lend_dt
+        , a.SPOINT_X AS spoint_x
+        , a.SPOINT_Y AS spoint_y
+        , a.RENT_SPOT AS rent_spot
+        , a.RTN_DT AS rtn_dt
+        , a.EPOINT_X AS epoint_x
+        , a.EPOINT_Y AS epoint_y
+        , a.RETURN_SPOT AS return_spot
+        , a.ILLE_PARK AS ille_park
+        FROM pm_lend_rtn_hstry AS a
+        <where>
+            <if test="ille_park != null">
+                AND ille_park = #{ille_park}
+            </if>
+        </where>
+    </select>
+
+    <update id="updateFCFWParking">
+        UPDATE pm_lend_rtn_hstry AS u, (SELECT DISTINCT a.ID,
+            CASE
+            WHEN st_distance_sphere(POINT(a.EPOINT_X, a.EPOINT_Y), POINT(g.location_x, g.location_y)) <![CDATA[>]]> 10
+            THEN 0
+            ELSE 1
+            END AS ILLE_PARK
+            FROM pm_fisvc_fclt AS g, (SELECT ID, EPOINT_X, EPOINT_Y FROM pm_lend_rtn_hstry WHERE ILLE_PARK IS Null) AS a
+            ) as s
+        set u.ILLE_PARK = s.ILLE_PARK, u.STEP = '02'
+        WHERE u.ID = s.ID;
+    </update>
+
+    <update id="updateBUSParking">
+        UPDATE pm_lend_rtn_hstry AS u, (SELECT DISTINCT a.ID,
+            CASE
+            WHEN st_distance_sphere(POINT(a.EPOINT_X, a.EPOINT_Y), POINT(g.location_x, g.location_y)) <![CDATA[>]]> 10
+            THEN 0
+            ELSE 1
+            END AS ILLE_PARK
+            FROM pm_ston AS g, (SELECT ID, EPOINT_X, EPOINT_Y FROM pm_lend_rtn_hstry WHERE STEP = '02' AND ILLE_PARK = 0) AS a
+            ) as s
+        set u.ILLE_PARK = s.ILLE_PARK, u.STEP = '03'
+        WHERE u.ID = s.ID;
+    </update>
+
+    <update id="updateSHBParking">
+        UPDATE pm_lend_rtn_hstry AS u, (SELECT DISTINCT a.ID,
+            CASE
+            WHEN st_distance_sphere(POINT(a.EPOINT_X, a.EPOINT_Y), POINT(g.location_x, g.location_y)) <![CDATA[>]]> 10
+            THEN 0
+            ELSE 1
+            END AS ILLE_PARK
+            FROM pm_smh AS g, (SELECT ID, EPOINT_X, EPOINT_Y FROM pm_lend_rtn_hstry WHERE STEP = '03' AND ILLE_PARK = 0) AS a
+            ) as s
+        set u.ILLE_PARK = s.ILLE_PARK, u.STEP = '04'
+        WHERE u.ID = s.ID;
+    </update>
+
+    <update id="updatePDCRParking">
+        UPDATE pm_lend_rtn_hstry AS u, (SELECT DISTINCT a.ID,
+            CASE
+            WHEN st_distance_sphere(POINT(a.EPOINT_X, a.EPOINT_Y), POINT(g.location_x, g.location_y)) <![CDATA[>]]> 10
+            THEN 0
+            ELSE 1
+            END AS ILLE_PARK
+            FROM pm_pedcrss AS g, (SELECT ID, EPOINT_X, EPOINT_Y FROM pm_lend_rtn_hstry WHERE STEP = '04' AND ILLE_PARK = 0) AS a
+            ) as s
+        set u.ILLE_PARK = s.ILLE_PARK, u.STEP = '05'
+        WHERE u.ID = s.ID;
+    </update>
+
+    <update id="updateCROSParking">
+        UPDATE pm_lend_rtn_hstry AS u, (SELECT DISTINCT a.ID,
+            CASE
+            WHEN st_distance_sphere(POINT(a.EPOINT_X, a.EPOINT_Y), POINT(g.location_x, g.location_y)) <![CDATA[>]]> 10
+            THEN 0
+            ELSE 1
+            END AS ILLE_PARK
+            FROM pm_crsrd AS g, (SELECT ID, EPOINT_X, EPOINT_Y FROM pm_lend_rtn_hstry WHERE STEP = '05' AND ILLE_PARK = 0) AS a
+            ) as s
+        set u.ILLE_PARK = s.ILLE_PARK, u.STEP = '06'
+        WHERE u.ID = s.ID;
+    </update>
+</mapper>

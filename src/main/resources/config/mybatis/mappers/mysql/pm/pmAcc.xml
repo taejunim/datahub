@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.pm.mapper.PmAccMapper">
+    <select id="selectList4Map" parameterType="pmAccSearch" resultType="egovMap">
+        SELECT
+        a.id
+        , a.dat_st_id
+        , a.oper_co
+        , a.pm_type
+        , a.sexd
+        , a.age
+        , a.acdnt_ocrn_dt
+        , a.acdnt_ocrn_plc
+        , a.acdnt_type
+        , a.acdnt_cn
+        , a.acdnt_spot
+        FROM pm_acdnt_rcpt_info AS a
+        <where>
+            1=1
+            <if test="accType != null and accType != ''">
+                AND acdnt_type = #{accType}
+            </if>
+            <if test="pmKind != 'all'">
+                <choose>
+                    <when test="pmKind != null and pmKind != ''">
+                        AND pm_type = #{pmKind}
+                    </when>
+                    <otherwise>
+                        AND pm_type is null
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="gender != null and gender != ''">
+                AND sexd = #{gender}
+            </if>
+            <if test="company != null and company != ''">
+                <choose>
+                    <when test="company == 'none'">
+                        AND oper_co is null
+                    </when>
+                    <otherwise>
+                        AND oper_co = #{company}
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="location != 'all'">
+                <choose>
+                    <when test="location != null and location != ''">
+                        AND acdnt_spot = #{location}
+                    </when>
+                    <otherwise>
+                        AND acdnt_spot is null
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="age != null">
+                <choose>
+                    <when test="age == 1">
+                        AND (age = '-' OR age IS NULL)
+                    </when>
+                    <when test="age &lt; 50">
+                        AND CAST(age AS INT) BETWEEN #{age} AND #{age} + 9
+                    </when>
+                    <otherwise>
+                        AND CAST(age AS INT) >= #{age}
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="startSearchDt != null and endSearchDt != null">
+                AND acdnt_ocrn_dt BETWEEN #{startSearchDt} AND #{endSearchDt}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectAccTypes" resultType="String">
+        select distinct acdnt_type from pm_acdnt_rcpt_info WHERE acdnt_type IS NOT NULL
+    </select>
+
+    <select id="selectOpers" resultType="String">
+        SELECT DISTINCT oper_co FROM pm_acdnt_rcpt_info WHERE oper_co IS NOT NULL
+    </select>
+
+    <select id="selectPmKinds" resultType="String">
+        select distinct pm_type from pm_acdnt_rcpt_info WHERE pm_type IS NOT NULL
+    </select>
+
+    <select id="selectSex" resultType="String">
+        select distinct sexd from pm_acdnt_rcpt_info WHERE sexd IS NOT NULL
+    </select>
+
+    <select id="selectSpot" resultType="String">
+        select distinct acdnt_spot from pm_acdnt_rcpt_info WHERE acdnt_spot IS NOT NULL
+    </select>
+
+</mapper>

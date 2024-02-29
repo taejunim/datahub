@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+	<display-name>JCMS</display-name>
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+
+	<!-- spring security -->
+	<filter>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter>
+		<filter-name>encodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>utf-8</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>encodingFilter</filter-name>
+		<url-pattern>*.mng</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>encodingFilter</filter-name>
+		<url-pattern>*.json</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>encodingFilter</filter-name>
+		<url-pattern>*.do</url-pattern>
+	</filter-mapping>
+
+	<!-- XSS Filter -->
+	<filter>
+		<filter-name>xssEscapeServletFilter</filter-name>
+		<filter-class>com.navercorp.lucy.security.xss.servletfilter.XssEscapeServletFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>xssEscapeServletFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<!-- spring configuration -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath*:/config/spring/context-*.xml</param-value>
+	</context-param>
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+
+	<listener>
+		<listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>
+	</listener>
+
+	<!-- spring web configuration -->
+	<servlet>
+		<servlet-name>action</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>classpath*:/config/springmvc-servlet.xml</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>action</servlet-name>
+		<url-pattern>*.mng</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>action</servlet-name>
+		<url-pattern>*.json</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>action</servlet-name>
+		<url-pattern>*.do</url-pattern>
+	</servlet-mapping>
+	
+	<filter>
+        <filter-name>SpringSecurityLoginFilter</filter-name>
+        <filter-class>net.jcms.framework.security.filter.SpringSecurityLoginFilter</filter-class>
+        <init-param>
+            <description>로그인 실패시 반활 될 URL설정</description>
+            <param-name>loginURL</param-name>
+            <param-value>/login/loginForm.mng</param-value>
+        </init-param>
+        <init-param>
+            <description>로그인 처리 URL설정</description>
+            <param-name>loginProcessURL</param-name>
+            <param-value>/login/login.mng</param-value>
+        </init-param>
+    </filter>
+    
+    <!-- SessionFilter -->
+	<filter>
+        <filter-name>SessionFilter</filter-name>
+        <filter-class>net.jcms.framework.security.filter.SessionFilter</filter-class>
+        <init-param>
+            <description>로그인 실패시 반활 될 URL설정</description>
+            <param-name>loginURL</param-name>
+            <param-value>/login/loginForm.mng</param-value>
+        </init-param>
+    </filter>
+	<filter-mapping>
+        <filter-name>SessionFilter</filter-name>
+        <url-pattern>/system/*</url-pattern>
+		<url-pattern>/tv/*</url-pattern>
+		<url-pattern>/pm/*</url-pattern>
+		<url-pattern>/pm/gis/gis.mng</url-pattern>
+    </filter-mapping>
+    
+	<filter-mapping>
+        <filter-name>SpringSecurityLoginFilter</filter-name>
+        <url-pattern>*.mng</url-pattern>
+    </filter-mapping>
+
+	<session-config>
+		<session-timeout>300</session-timeout>    <!-- 30 minutes -->
+	</session-config>
+
+
+	<!-- error handling -->
+	<error-page>
+		<error-code>404</error-code>
+		<location>/error/error.mng?errorCode=404</location>
+	</error-page>
+	<error-page>
+		<error-code>405</error-code>
+		<location>/error/error.mng?errorCode=405</location>
+	</error-page>
+	<error-page>
+		<exception-type>java.lang.Throwable</exception-type>
+		<location>/error/error.mng?errorCode=unknown</location>
+	</error-page>
+
+</web-app>

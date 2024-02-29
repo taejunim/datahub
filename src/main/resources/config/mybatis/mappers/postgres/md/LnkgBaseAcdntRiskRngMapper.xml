@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.datahub.martData.mapper.LnkgBaseAcdntRiskRngMapper">
+	<!-- ### 메크로 정의 -->
+	<sql id="tb"> datamart.lnkg_base_acdnt_risk_rng </sql>
+	<sql id="s"> select * </sql>
+	<sql id="sl"> select 
+		id,
+		dat_st_id,
+		crt_dt,
+		mdfcn_dt,
+		acdnt_risk_rng_id,
+		acdnt_risk_rng_id_crt_dt,
+		acdnt_risk_rng_id_mdfcn_dt,
+		acdnt_risk_rng_nm,
+		acdnt_risk_rng_nm_crt_dt,
+		acdnt_risk_rng_nm_mdfcn_dt,
+		acdnt_risk_rng,
+		acdnt_risk_rng_crt_dt,
+		acdnt_risk_rng_mdfcn_dt,
+		acdnt_nocs,
+		dcsd_cnt,
+		swsn_cnt,
+		sijn_cnt,
+		inj_dcl_cnt,
+		dmge_info_crt_dt,
+		dmge_info_mdfcn_dt,
+		cept_crd,
+		cept_crd_crt_dt,
+		cept_crd_mdfcn_dt,
+		acdnt_anls_type_dtl,
+		acdnt_anls_type_dtl_crt_dt,
+		acdnt_anls_type_dtl_mdfcn_dt,
+		acdnt_anls_type_nm,
+		acdnt_anls_type_nm_crt_dt,
+		acdnt_anls_type_nm_mdfcn_dt
+	</sql>
+	<sql id="f"> from <include refid="tb"/> </sql>
+	<sql id="lw">
+		<where>
+			<if test="!empty(recSt)"> and REC_ST = #{recSt} </if>
+			<include refid="BaseSql.BaseWhere"/>
+		</where>
+	</sql>
+	<sql id="fw">
+		<where>
+			and id = #{id}
+			<include refid="BaseSql.BaseWhere"/>
+		</where>
+	</sql>
+	<sql id="ord">
+		<if test="empty(sort)"> order by id </if>
+		<if test="!empty(sort)"> order by ${sort} </if>
+		<if test="!empty(sortOrd)"> ${sortOrd} </if>
+		<if test="pagingYn == true" > limit #{start}, #{length}	</if>
+	</sql>
+	<!-- ### Select -->
+	<select id="select" parameterType="lnkgBaseAcdntRiskRng" resultType="lnkgBaseAcdntRiskRng">
+		<include refid="s"/>
+		<include refid="f"/>
+		<include refid="fw"/>
+	</select>
+
+	<!-- ### selectList -->
+	<select id="selectList" parameterType="lnkgBaseAcdntRiskRng" resultType="lnkgBaseAcdntRiskRng">
+		<include refid="sl"/>
+		<include refid="f"/>
+		<include refid="lw"/>
+		<include refid="ord"/>
+	</select>
+	<!-- ### Count -->
+	<select id="count" parameterType="lnkgBaseAcdntRiskRng" resultType="java.lang.Integer">
+		select COUNT(*)
+		<include refid="f"/>
+		<include refid="lw"/>
+	</select>
+	<!-- ### Insert -->
+	<insert id="insert" parameterType="lnkgBaseAcdntRiskRng" >
+		insert into lnkg_base_acdnt_risk_rng (
+			id,
+			dat_st_id,
+			crt_dt,
+			mdfcn_dt,
+			acdnt_risk_rng_id,
+			acdnt_risk_rng_id_crt_dt,
+			acdnt_risk_rng_id_mdfcn_dt,
+			acdnt_risk_rng_nm,
+			acdnt_risk_rng_nm_crt_dt,
+			acdnt_risk_rng_nm_mdfcn_dt,
+			acdnt_risk_rng,
+			acdnt_risk_rng_crt_dt,
+			acdnt_risk_rng_mdfcn_dt,
+			acdnt_nocs,
+			dcsd_cnt,
+			swsn_cnt,
+			sijn_cnt,
+			inj_dcl_cnt,
+			dmge_info_crt_dt,
+			dmge_info_mdfcn_dt,
+			cept_crd,
+			cept_crd_crt_dt,
+			cept_crd_mdfcn_dt,
+			acdnt_anls_type_dtl,
+			acdnt_anls_type_dtl_crt_dt,
+			acdnt_anls_type_dtl_mdfcn_dt,
+			acdnt_anls_type_nm,
+			acdnt_anls_type_nm_crt_dt,
+			acdnt_anls_type_nm_mdfcn_dt
+			<include refid="BaseSql.InRegRecStPrm"/>
+		) values (
+			#{id},
+			#{datStId},
+			#{crtDt},
+			#{mdfcnDt},
+			#{acdntRiskRngId},
+			#{acdntRiskRngIdCrtDt},
+			#{acdntRiskRngIdMdfcnDt},
+			#{acdntRiskRngNm},
+			#{acdntRiskRngNmCrtDt},
+			#{acdntRiskRngNmMdfcnDt},
+			#{acdntRiskRng},
+			#{acdntRiskRngCrtDt},
+			#{acdntRiskRngMdfcnDt},
+			#{acdntNocs},
+			#{dcsdCnt},
+			#{swsnCnt},
+			#{sijnCnt},
+			#{injDclCnt},
+			#{dmgeInfoCrtDt},
+			#{dmgeInfoMdfcnDt},
+			#{ceptCrd},
+			#{ceptCrdCrtDt},
+			#{ceptCrdMdfcnDt},
+			#{acdntAnlsTypeDtl},
+			#{acdntAnlsTypeDtlCrtDt},
+			#{acdntAnlsTypeDtlMdfcnDt},
+			#{acdntAnlsTypeNm},
+			#{acdntAnlsTypeNmCrtDt},
+			#{acdntAnlsTypeNmMdfcnDt}
+			<include refid="BaseSql.InRegRecStVal"/>
+		)
+	</insert>
+
+	<!-- ### update -->
+	<update id="update" parameterType="lnkgBaseAcdntRiskRng">
+		update <include refid="tb"/> set
+			dat_st_id= #{datStId}
+			<if test="isNotNull(crtDt)" > , crt_dt= #{crtDt} </if>
+			<if test="isNotNull(mdfcnDt)" > , mdfcn_dt= #{mdfcnDt} </if>
+			<if test="isNotNull(acdntRiskRngId)" > , acdnt_risk_rng_id= #{acdntRiskRngId} </if>
+			<if test="isNotNull(acdntRiskRngIdCrtDt)" > , acdnt_risk_rng_id_crt_dt= #{acdntRiskRngIdCrtDt} </if>
+			<if test="isNotNull(acdntRiskRngIdMdfcnDt)" > , acdnt_risk_rng_id_mdfcn_dt= #{acdntRiskRngIdMdfcnDt} </if>
+			<if test="isNotNull(acdntRiskRngNm)" > , acdnt_risk_rng_nm= #{acdntRiskRngNm} </if>
+			<if test="isNotNull(acdntRiskRngNmCrtDt)" > , acdnt_risk_rng_nm_crt_dt= #{acdntRiskRngNmCrtDt} </if>
+			<if test="isNotNull(acdntRiskRngNmMdfcnDt)" > , acdnt_risk_rng_nm_mdfcn_dt= #{acdntRiskRngNmMdfcnDt} </if>
+			<if test="isNotNull(acdntRiskRng)" > , acdnt_risk_rng= #{acdntRiskRng} </if>
+			<if test="isNotNull(acdntRiskRngCrtDt)" > , acdnt_risk_rng_crt_dt= #{acdntRiskRngCrtDt} </if>
+			<if test="isNotNull(acdntRiskRngMdfcnDt)" > , acdnt_risk_rng_mdfcn_dt= #{acdntRiskRngMdfcnDt} </if>
+			<if test="isNotNull(acdntNocs)" > , acdnt_nocs= #{acdntNocs} </if>
+			<if test="isNotNull(dcsdCnt)" > , dcsd_cnt= #{dcsdCnt} </if>
+			<if test="isNotNull(swsnCnt)" > , swsn_cnt= #{swsnCnt} </if>
+			<if test="isNotNull(sijnCnt)" > , sijn_cnt= #{sijnCnt} </if>
+			<if test="isNotNull(injDclCnt)" > , inj_dcl_cnt= #{injDclCnt} </if>
+			<if test="isNotNull(dmgeInfoCrtDt)" > , dmge_info_crt_dt= #{dmgeInfoCrtDt} </if>
+			<if test="isNotNull(dmgeInfoMdfcnDt)" > , dmge_info_mdfcn_dt= #{dmgeInfoMdfcnDt} </if>
+			<if test="isNotNull(ceptCrd)" > , cept_crd= #{ceptCrd} </if>
+			<if test="isNotNull(ceptCrdCrtDt)" > , cept_crd_crt_dt= #{ceptCrdCrtDt} </if>
+			<if test="isNotNull(ceptCrdMdfcnDt)" > , cept_crd_mdfcn_dt= #{ceptCrdMdfcnDt} </if>
+			<if test="isNotNull(acdntAnlsTypeDtl)" > , acdnt_anls_type_dtl= #{acdntAnlsTypeDtl} </if>
+			<if test="isNotNull(acdntAnlsTypeDtlCrtDt)" > , acdnt_anls_type_dtl_crt_dt= #{acdntAnlsTypeDtlCrtDt} </if>
+			<if test="isNotNull(acdntAnlsTypeDtlMdfcnDt)" > , acdnt_anls_type_dtl_mdfcn_dt= #{acdntAnlsTypeDtlMdfcnDt} </if>
+			<if test="isNotNull(acdntAnlsTypeNm)" > , acdnt_anls_type_nm= #{acdntAnlsTypeNm} </if>
+			<if test="isNotNull(acdntAnlsTypeNmCrtDt)" > , acdnt_anls_type_nm_crt_dt= #{acdntAnlsTypeNmCrtDt} </if>
+			<if test="isNotNull(acdntAnlsTypeNmMdfcnDt)" > , acdnt_anls_type_nm_mdfcn_dt= #{acdntAnlsTypeNmMdfcnDt} </if>
+			<include refid="BaseSql.Update" />
+			<include refid="fw"/>
+	</update>
+
+	<!-- ### delete -->
+	<update id="delete" parameterType="lnkgBaseAcdntRiskRng" >
+		update <include refid="tb"/> set
+		<include refid="BaseSql.Delete" />
+		<include refid="fw"/>
+	</update>
+</mapper>

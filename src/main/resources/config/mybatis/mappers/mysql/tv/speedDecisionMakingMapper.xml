@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.tv.protectionZone.mapper.SpeedDecisionMakingMapper">
+
+    <select id="getBarChartData" parameterType="speedDecisionMaking" resultType="speedDecisionMaking">
+        WITH RECURSIVE nrows(date) AS (
+        SELECT DATE(#{startDate})
+        UNION ALL
+        <choose>
+            <when test='period == "day"'>
+                SELECT DATE_ADD(date,INTERVAL 1 day)
+            </when>
+            <when test='period == "month"'>
+                SELECT DATE_ADD(date,INTERVAL 1 month)
+            </when>
+            <when test='period == "year"'>
+                SELECT DATE_ADD(date,INTERVAL 1 year)
+            </when>
+            <otherwise>
+                SELECT DATE_ADD(date,INTERVAL 1 day)
+            </otherwise>
+        </choose>
+        FROM nrows
+        WHERE date <![CDATA[ < ]]> DATE(#{endDate})
+        )
+        SELECT
+        <choose>
+            <when test='period == "day"'>
+                CONCAT(DATE_FORMAT(T2.Date, '%e'), '일') AS baseDate
+            </when>
+            <when test='period == "month"'>
+                CONCAT(DATE_FORMAT(T2.Date, '%c'), '월') AS baseDate
+            </when>
+            <when test='period == "year"'>
+                CONCAT(DATE_FORMAT(T2.Date, '%Y'), '년') AS baseDate
+            </when>
+            <otherwise>
+                CONCAT(DATE_FORMAT(T2.Date, '%e'), '일') AS baseDate
+            </otherwise>
+        </choose>
+             , IFNULL(T2.type, '-') AS type
+             , IFNULL(T1.populationTraffic, 0) AS populationTraffic
+        FROM (
+                SELECT <choose>
+                            <when test='period == "day"'>
+                                STR_TO_DATE(base_date, '%Y%m%d') AS baseDate
+                            </when>
+                            <when test='period == "month"'>
+                                SUBSTR(DATE_FORMAT(CONCAT(base_date,'01'), '%Y-%m-%d'),1,7) AS baseDate
+                            </when>
+                            <when test='period == "year"'>
+                                SUBSTR(DATE_FORMAT(CONCAT(base_date,'01'), '%Y-%m-%d'),1,4) AS baseDate
+                            </when>
+                            <otherwise>
+                                STR_TO_DATE(base_date, '%Y%m%d') AS baseDate
+                            </otherwise>
+                        </choose>
+                        <choose>
+                            <when test='type == "timeZoneCode"'>
+                            , CASE WHEN timezn_cd = '1' THEN '오전'
+                                   WHEN timezn_cd = '2' THEN '오후'
+                               END AS type
+                            </when>
+                            <when test='type == "gender"'>
+                            , CASE WHEN sex = 'M' THEN '남성'
+                                   WHEN sex = 'F' THEN '여성'
+                               END AS type
+                            </when>
+                        </choose>
+                     , SUM(visit_pop) AS populationTraffic
+        <choose>
+            <when test='period == "day"'>
+                FROM jj_spop_korn_50cell_day
+                WHERE base_date <![CDATA[ >= ]]> #{startDate}
+                AND base_date <![CDATA[ < ]]> #{endDate}
+            </when>
+            <when test='period == "month"'>
+                FROM jj_spop_korn_50cell_month
+                WHERE base_date <![CDATA[ >= ]]> SUBSTR(#{startDate}, 1,6)
+                AND base_date <![CDATA[ < ]]> SUBSTR(#{endDate}, 1,6)
+            </when>
+            <when test='period == "year"'>
+                FROM jj_spop_korn_50cell_month
+                WHERE base_date <![CDATA[ >= ]]> SUBSTR(#{startDate}, 1,6)
+                AND base_date <![CDATA[ < ]]> SUBSTR(#{endDate}, 1,6)
+            </when>
+            <otherwise>
+                FROM jj_spop_korn_50cell_day
+                WHERE base_date <![CDATA[ >= ]]> #{startDate}
+                AND base_date <![CDATA[ < ]]> #{endDate}
+            </otherwise>
+        </choose>
+                AND j_50_cd IN (
+                <choose>
+                    <when test="cellId != null and cellId.size != 0">
+                        <foreach collection='cellId' index='index' item='cellId' separator=','>
+                            #{cellId}
+                        </foreach>
+                    </when>
+                    <otherwise>
+                        ''
+                    </otherwise>
+                </choose>
+                )
+                GROUP BY
+                <choose>
+                    <when test='period == "day"'>
+                        base_date
+                    </when>
+                    <when test='period == "month"'>
+                        base_date
+                    </when>
+                    <when test='period == "year"'>
+                        SUBSTR(DATE_FORMAT(CONCAT(base_date,'01'), '%Y-%m-%d'),1,4)
+                    </when>
+                    <otherwise>
+                        base_date
+                    </otherwise>
+                </choose>
+
+                <choose>
+                    <when test='type == "timeZoneCode"'>
+                        , timezn_cd
+                    </when>
+                    <when test='type == "gender"'>
+                        , sex
+                    </when>
+                </choose>
+             ) T1
+             RIGHT OUTER JOIN (SELECT A1.date as date
+                                    , A2.type
+                               FROM nrows A1
+                                    <choose>
+                                        <when test='type == "timeZoneCode"'>
+                                            , (SELECT '오전' AS type UNION ALL SELECT '오후') A2
+                                        </when>
+                                        <when test='type == "gender"'>
+                                            , (SELECT '남성' AS type UNION ALL SELECT '여성') A2
+                                        </when>
+                                    </choose>
+                               )
+                            <choose>
+                                <when test='period == "day"'>
+                                    T2 ON T1.baseDate = T2.Date
+                                </when>
+                                <when test='period == "month"'>
+                                    T2 ON T1.baseDate = SUBSTR(T2.Date,1,7)
+                                </when>
+                                <when test='period == "year"'>
+                                    T2 ON T1.baseDate = SUBSTR(T2.Date,1,4)
+                                </when>
+                                <otherwise>
+                                    T2 ON T1.baseDate = T2.Date
+                                </otherwise>
+                            </choose> AND T1.type = T2.type
+        WHERE T2.Date <![CDATA[ >= ]]> #{startDate}
+        AND T2.Date <![CDATA[ < ]]> #{endDate}
+        ORDER BY T2.Date, T2.type
+    </select>
+
+    <select id="getPieChartData" parameterType="speedDecisionMaking" resultType="speedDecisionMaking">
+        select COALESCE(T2.type, '-')                        AS type
+             , COALESCE(T1.populationTraffic, 0) AS populationTraffic
+        FROM (
+                SELECT <choose>
+                            <when test='type == "timeZoneCode"'>
+                            CASE WHEN timezn_cd = '1' THEN '오전'
+                                 WHEN timezn_cd = '2' THEN '오후'
+                            END AS type
+                            </when>
+                            <when test='type == "gender"'>
+                            CASE WHEN sex = 'M' THEN '남성'
+                                 WHEN sex = 'F' THEN '여성'
+                            END AS type
+                            </when>
+                        </choose>
+                     , SUM(visit_pop) AS populationTraffic
+                <choose>
+                    <when test='period == "day"'>
+                        FROM jj_spop_korn_50cell_day
+                        WHERE base_date <![CDATA[ >= ]]> #{startDate}
+                        AND base_date <![CDATA[ < ]]> #{endDate}
+                    </when>
+                    <when test='period == "month"'>
+                        FROM jj_spop_korn_50cell_month
+                        WHERE base_date <![CDATA[ >= ]]> SUBSTR(#{startDate}, 1,6)
+                        AND base_date <![CDATA[ < ]]> SUBSTR(#{endDate}, 1,6)
+                    </when>
+                    <when test='period == "year"'>
+                        FROM jj_spop_korn_50cell_month
+                        WHERE base_date <![CDATA[ >= ]]> SUBSTR(#{startDate}, 1,6)
+                        AND base_date <![CDATA[ < ]]> SUBSTR(#{endDate}, 1,6)
+                    </when>
+                    <otherwise>
+                        FROM jj_spop_korn_50cell_day
+                        WHERE base_date <![CDATA[ >= ]]> #{startDate}
+                        AND base_date <![CDATA[ < ]]> #{endDate}
+                    </otherwise>
+                </choose>
+                AND j_50_cd IN (
+                <choose>
+                    <when test="cellId != null and cellId.size != 0">
+                        <foreach collection='cellId' index='index' item='cellId' separator=','>
+                            #{cellId}
+                        </foreach>
+                    </when>
+                    <otherwise>
+                        ''
+                    </otherwise>
+                </choose>
+                )
+                GROUP BY type
+            ) T1
+            RIGHT OUTER JOIN (
+            <choose>
+                <when test='type == "timeZoneCode"'>
+                    select '오전' as type UNION ALL select '오후'
+                </when>
+                <when test='type == "gender"'>
+                    select '남성' as type UNION ALL select '여성'
+                </when>
+            </choose>
+            ) T2 ON T1.type = T2.type
+    </select>
+</mapper>

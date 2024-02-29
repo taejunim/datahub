@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.jcms.framework.cd.mapper.CdMapper">
+
+	<sql id="tb"> JCMS_CD </sql>
+	<sql id="jtb"> JCMS_CD </sql>
+	<sql id="s">
+		SELECT CD_ID, CD_CLS_ID, CD_NM, CD_DESC, REC_ST, REG_ID, REG_DT, UPD_ID, UPD_DT
+	</sql>
+	<sql id="l">
+		SELECT CD_ID, CD_CLS_ID, CD_NM, CD_DESC, REC_ST, REG_ID, REG_DT, UPD_ID, UPD_DT
+	</sql>
+	<sql id="sf"> FROM <include refid="tb"/> </sql>
+	<sql id="lf"> FROM <include refid="jtb"/> </sql>
+	<sql id="sw">
+		WHERE DEL_DT IS NULL
+			AND CD_ID = #{cdId}
+	</sql>
+	<sql id="lw">
+		WHERE DEL_DT IS NULL
+			<if test="!empty(cdClsId)"> AND CD_CLS_ID = #{cdClsId} </if>
+			<if test="!empty(recSt)"> AND REC_ST = #{recSt} </if>
+	</sql>
+	<sql id="ord">
+		<if test="!empty(sort) and !empty(sortOrd)"> ORDER BY ${sort} ${sortOrd} </if>
+		<if test="pagingYn == true"> limit #{start}, #{length} </if>
+	</sql>
+
+
+	<select id="select" parameterType="cd" resultType="cd">
+		<include refid="s"/>
+		<include refid="sf"/>
+		<include refid="sw"/>
+	</select>
+	
+	<select id="selectList" parameterType="cd" resultType="cd">
+		<include refid="l"/>
+		<include refid="lf"/>
+		<include refid="lw"/>
+		<include refid="ord"/>
+	</select>
+	
+	<select id="count" parameterType="cd" resultType="java.lang.Integer">
+		SELECT COUNT(CD_ID)
+		<include refid="lf"/>
+		<include refid="lw"/>
+	</select>
+	
+	<select id="existCount" parameterType="cd" resultType="java.lang.Integer">
+		SELECT COUNT(CD_ID)
+		<include refid="sf"/>
+		WHERE DEL_DT IS NULL
+			AND (CD_ID = #{cdId} OR CD_NM = #{cdNm})
+	</select>
+	
+	<insert id="insert" parameterType="cd">
+		INSERT INTO <include refid="tb"/> (
+			CD_ID, CD_CLS_ID, CD_NM, CD_DESC, REC_ST, REG_ID, REG_DT
+		) VALUES (
+			#{cdId}, #{cdClsId}, #{cdNm}, #{cdDesc,jdbcType=VARCHAR}, #{recSt}, #{regId}, SYSDATE()
+		)
+	</insert>
+	
+	<update id="update" parameterType="cd">
+		UPDATE <include refid="tb"/>
+		SET <include refid="BaseSql.Update"/>
+			, CD_NM = #{cdNm}
+			, CD_DESC = #{cdDesc,jdbcType=VARCHAR}
+			, REC_ST =  #{recSt}
+		WHERE
+			CD_ID = #{cdId,jdbcType=VARCHAR} and 
+			DEL_DT IS NULL
+	</update>
+	
+	<delete id="delete" parameterType="cd">
+		DELETE FROM <include refid="tb"/>
+		WHERE CD_ID = #{cdId}
+			AND CD_CLS_ID = #{cdClsId}
+	</delete>
+
+</mapper>

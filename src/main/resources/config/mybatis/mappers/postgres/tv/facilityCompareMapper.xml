@@ -1,0 +1,636 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.datahub.tv.common.mapper.TvCompareMapper">
+    <!-- cctv 비교 정보 -->
+    <select id="cctvCompareInformation" parameterType="tvCommonSearchCondition" resultType="egovMap">
+
+        WITH TEMP_TABLE AS (
+            SELECT zoneName schl_nm
+                 , COUNT(*) count
+            FROM (
+                SELECT zoneName
+                     , id
+                FROM (
+                    SELECT zoneName
+                         , a.id
+                         , ( 6371 * 2 * ASIN(
+                                SQRT(
+                                    SIN(RADIANS(zoneLongitude::DOUBLE PRECISION - longitude) / 2) * SIN(RADIANS(zoneLongitude::DOUBLE PRECISION - longitude) / 2) +
+                                    COS(RADIANS(longitude)) * COS(RADIANS(zoneLongitude::DOUBLE PRECISION)) *
+                                    SIN(RADIANS(zoneLatitude::DOUBLE PRECISION - latitude) / 2) * SIN(RADIANS(zoneLatitude::DOUBLE PRECISION - latitude) / 2))
+                                )
+                            ) AS distance
+                    FROM (
+                        SELECT schl_nm                                zoneName
+                             , SPLIT_PART(ptcn_zone_rng_info, ',', 1) zoneLatitude
+                             , SPLIT_PART(ptcn_zone_rng_info, ',', 2) zoneLongitude
+                        FROM datamart.ptcn_zone_bk) zone,
+                        (
+                        SELECT id
+                             , SUBSTR(replace(cctv_rng_info, ',' ,' '), 0, POSITION(' ' IN replace(cctv_rng_info, ',' ,' ')))::DOUBLE PRECISION AS latitude
+                             , SUBSTR(replace(cctv_rng_info, ',' ,' '), POSITION(' ' IN replace(cctv_rng_info, ',' ,' ')) + 1)::DOUBLE PRECISION AS longitude
+                        FROM (
+                            SELECT  MAX(id)              as id
+                                     , replace(cctv_rng_info, ',' ,' ') as cctv_rng_info
+                            FROM datamart.cctv
+                            GROUP BY replace(cctv_rng_info, ',' ,' ')
+                        ) cctv) a
+                    ) a
+                    WHERE distance <![CDATA[ < ]]> #{distance}::DOUBLE PRECISION
+                    GROUP BY zoneName, id
+            ) countTable
+            GROUP BY schl_nm
+            ORDER BY schl_nm
+        )
+        SELECT  max, avg, min
+             , (SELECT coalesce(string_agg(distinct schl_nm, ', '),'-') schlNm
+                FROM TEMP_TABLE
+                )                                                        as includeZone
+             , (SELECT coalesce(string_agg(distinct A.schlNm, ', '),'-') schlNm
+                FROM (
+                    SELECT schl_nm schlNm
+                    FROM datamart.ptcn_zone_bk
+                    EXCEPT SELECT DISTINCT TEMP_TABLE.schl_nm
+                    FROM TEMP_TABLE INNER JOIN datamart.ptcn_zone_bk ON datamart.ptcn_zone_bk.schl_nm = TEMP_TABLE.schl_nm
+                ) A
+             )                                                          as missZone
+            , (SELECT coalesce(string_agg(schl_nm, ', '),'-')
+               FROM TEMP_TABLE
+               WHERE count = result.max
+            )                                                           as maxZone
+            , (SELECT coalesce(string_agg(schl_nm, ', '),'-') schlNm
+               FROM TEMP_TABLE
+               WHERE count = result.min
+            )                                                           as minZone
+            , (SELECT COUNT(*) FROM TEMP_TABLE)                         as includeZoneCount
+            , (ptcnCount - (SELECT COUNT(*) FROM TEMP_TABLE))           as missZoneCount
+            , (SELECT COUNT(*)
+               FROM (
+                   SELECT  MAX(id)
+                         , replace(cctv_rng_info, ',' ,' ')
+                   FROM datamart.cctv
+                   GROUP BY replace(cctv_rng_info, ',' ,' ')
+             ) facility )                                                as totalCount
+        FROM (
+            SELECT coalesce(MAX(T.count),0)             as max
+                 , coalesce(ROUND(AVG(T.count), 1),0)   as avg
+                 , coalesce(MIN(T.count)  ,0)           as min
+                 , (SELECT COUNT(distinct schl_nm) FROM datamart.ptcn_zone_bk) as ptcnCount
+            FROM TEMP_TABLE T
+        ) result
+    </select>
+    <!-- 횡단보도 비교 정보 -->
+    <select id="crossWalkCompareInformation" parameterType="tvCommonSearchCondition" resultType="egovMap">
+
+        WITH TEMP_TABLE AS (
+            SELECT zoneName schl_nm
+                 , COUNT(*) count
+            FROM (
+                SELECT zoneName
+                     , id
+                FROM (
+                    SELECT zoneName
+                         , a.id
+                         , ( 6371 * 2 * ASIN(
+                               SQRT(
+                                 SIN(RADIANS(zoneLongitude::DOUBLE PRECISION - longitude) / 2) * SIN(RADIANS(zoneLongitude::DOUBLE PRECISION - longitude) / 2) +
+                                 COS(RADIANS(longitude)) * COS(RADIANS(zoneLongitude::DOUBLE PRECISION)) *
+                                 SIN(RADIANS(zoneLatitude::DOUBLE PRECISION - latitude) / 2) * SIN(RADIANS(zoneLatitude::DOUBLE PRECISION - latitude) / 2))
+                               )
+                           ) AS distance
+                    FROM (
+                        SELECT schl_nm                                zoneName
+                             , SPLIT_PART(ptcn_zone_rng_info, ',', 1) zoneLatitude
+                             , SPLIT_PART(ptcn_zone_rng_info, ',', 2) zoneLongitude
+                        FROM datamart.ptcn_zone_bk) zone,
+                        (
+                        SELECT id
+                             , SUBSTR(pedcrss_rng_info, 0, POSITION(',' IN pedcrss_rng_info))::DOUBLE PRECISION  latitude
+                             , SUBSTR(pedcrss_rng_info, POSITION(',' IN pedcrss_rng_info) + 1)::DOUBLE PRECISION longitude
+                        FROM (
+                             SELECT MAX(id)               as id
+                                  , MAX(pedcrss_rng_info) as pedcrss_rng_info
+                                  , pedcrss_rng
+                             FROM datamart.pedcrss
+                             GROUP BY pedcrss_rng
+                            ) cr) a
+                ) ct
+        WHERE distance <![CDATA[ < ]]> #{distance}::DOUBLE PRECISION
+        GROUP BY ct.zoneName, ct.id
+            ) countTable
+            GROUP BY schl_nm
+            ORDER BY schl_nm
+        )
+        SELECT  max, avg, min
+             , (SELECT coalesce(string_agg(distinct schl_nm, ', '),'-') schlNm
+                FROM TEMP_TABLE
+             )                                                          as includeZone
+             , (SELECT coalesce(string_agg(distinct A.schlNm, ', '),'-') schlNm
+                FROM (
+                    SELECT schl_nm schlNm
+                    FROM datamart.ptcn_zone_bk
+                    EXCEPT SELECT DISTINCT TEMP_TABLE.schl_nm
+                    FROM TEMP_TABLE INNER JOIN datamart.ptcn_zone_bk ON datamart.ptcn_zone_bk.schl_nm = TEMP_TABLE.schl_nm
+                ) A
+             )                                                          as missZone
+            , (SELECT coalesce(string_agg(schl_nm, ', '),'-')
+               FROM TEMP_TABLE
+               WHERE count = result.max
+            )                                                           as maxZone
+            , (SELECT coalesce(string_agg(schl_nm, ', '),'-') schlNm
+               FROM TEMP_TABLE
+               WHERE count = result.min
+            )                                                           as minZone
+            , (SELECT COUNT(*) FROM TEMP_TABLE)                         as includeZoneCount
+            , (ptcnCount - (SELECT COUNT(*) FROM TEMP_TABLE))           as missZoneCount
+            , (SELECT COUNT(*) FROM (
+                   SELECT MAX(id)      AS id
+                        , pedcrss_rng
+                   FROM datamart.pedcrss
+                   GROUP BY pedcrss_rng
+                    ) facility
+               )                                                        as totalCount
+        FROM (
+            SELECT coalesce(MAX(T.count),0)             as max
+                 , coalesce(ROUND(AVG(T.count), 1),0)   as avg
+                 , coalesce(MIN(T.count)  ,0)           as min
+                 , (SELECT COUNT(distinct schl_nm) FROM datamart.ptcn_zone_bk) as ptcnCount
+            FROM TEMP_TABLE T
+        ) result
+    </select>
+    <!-- 승/하차구역 비교 정보 -->
+    <select id="childPickupZoneCompareInformation" parameterType="tvCommonSearchCondition" resultType="egovMap">
+        WITH TEMP_TABLE AS (
+            SELECT zoneName schl_nm
+                 , COUNT(*) count
+            FROM (
+                SELECT zoneName
+                     , id
+                FROM (
+                    SELECT zoneName
+                         , a.id
+                         , ( 6371 * 2 * ASIN(
+                                SQRT(
+                                    SIN(RADIANS(zoneLongitude::DOUBLE PRECISION - longitude) / 2) * SIN(RADIANS(zoneLongitude::DOUBLE PRECISION - longitude) / 2) +
+                                    COS(RADIANS(longitude)) * COS(RADIANS(zoneLongitude::DOUBLE PRECISION)) *
+                                    SIN(RADIANS(zoneLatitude::DOUBLE PRECISION - latitude) / 2) * SIN(RADIANS(zoneLatitude::DOUBLE PRECISION - latitude) / 2))
+                                )
+                            ) AS distance
+                    FROM (
+                        SELECT schl_nm                                zoneName
+                             , SPLIT_PART(ptcn_zone_rng_info, ',', 1) zoneLatitude
+                             , SPLIT_PART(ptcn_zone_rng_info, ',', 2) zoneLongitude
+                        FROM datamart.ptcn_zone_bk) zone,
+                        (
+                        SELECT id
+                             , (substr(bgng_rng, 0, position(',' IN bgng_rng))::DOUBLE PRECISION
+                                + substr(end_rng, position(',' IN end_rng) + 1)::DOUBLE PRECISION  )/2 longitude
+                             , (substr(bgng_rng, position(',' IN bgng_rng) + 1)::DOUBLE PRECISION
+                                + substr(end_rng, 0, position(',' IN end_rng))::DOUBLE PRECISION )/2 latitude
+                        FROM  (
+                                SELECT Max(id)            id
+                                     , MAX(bgng_rng) bgng_rng
+                                     , MAX(end_rng)   end_rng
+                                     , onaoff_zone_rng
+                                FROM datamart.cld_onaoff_zone
+                                GROUP BY onaoff_zone_rng
+                              ) facility
+                        ) a
+                ) ct
+        WHERE distance <![CDATA[ < ]]> #{distance}::DOUBLE PRECISION
+        GROUP BY ct.zoneName, ct.id
+            ) countTable
+            GROUP BY schl_nm
+            ORDER BY schl_nm
+        )
+        SELECT  max, avg, min
+             , (SELECT coalesce(string_agg(distinct schl_nm, ', '),'-') schlNm
+                FROM TEMP_TABLE
+             )                                                          as includeZone
+             , (SELECT coalesce(string_agg(distinct A.schlNm, ', '),'-') schlNm
+                FROM (
+                    SELECT schl_nm schlNm
+                    FROM datamart.ptcn_zone_bk
+                    EXCEPT SELECT DISTINCT TEMP_TABLE.schl_nm
+                    FROM TEMP_TABLE INNER JOIN datamart.ptcn_zone_bk ON datamart.ptcn_zone_bk.schl_nm = TEMP_TABLE.schl_nm
+                ) A
+             )                                                          as missZone
+            , (SELECT coalesce(string_agg(schl_nm, ', '),'-')
+               FROM TEMP_TABLE
+               WHERE count = result.max
+            )                                                           as maxZone
+            , (SELECT coalesce(string_agg(schl_nm, ', '),'-') schlNm
+               FROM TEMP_TABLE
+               WHERE count = result.min
+            )                                                           as minZone
+            , (SELECT COUNT(*) FROM TEMP_TABLE)                         as includeZoneCount
+            , (ptcnCount - (SELECT COUNT(*) FROM TEMP_TABLE))           as missZoneCount
+            , (SELECT COUNT(*) FROM (
+                   SELECT MAX(id), onaoff_zone_rng FROM datamart.cld_onaoff_zone GROUP BY onaoff_zone_rng
+               ) facility
+            )                                                           as totalCount
+        FROM (
+            SELECT coalesce(MAX(T.count),0)             as max
+                 , coalesce(ROUND(AVG(T.count), 1),0)   as avg
+                 , coalesce(MIN(T.count)  ,0)           as min
+                 , (SELECT COUNT(distinct schl_nm) FROM datamart.ptcn_zone_bk) as ptcnCount
+            FROM TEMP_TABLE T
+        ) result
+
+    </select>
+    <!-- 일방통행도로 비교 정보 -->
+    <select id="oneWayRoadCompareInformation" parameterType="tvCommonSearchCondition" resultType="egovMap">
+    WITH TEMP_TABLE AS (
+            SELECT zoneName schl_nm
+                 , COUNT(*) count
+            FROM (
+                SELECT zoneName
+                     , id
+                FROM (
+                    SELECT zoneName
+                         , a.id
+                         , ( 6371 * 2 * ASIN(
+                                SQRT(
+                                    SIN(RADIANS(zoneLongitude::DOUBLE PRECISION - longitude) / 2) * SIN(RADIANS(zoneLongitude::DOUBLE PRECISION - longitude) / 2) +
+                                    COS(RADIANS(longitude)) * COS(RADIANS(zoneLongitude::DOUBLE PRECISION)) *
+                                    SIN(RADIANS(zoneLatitude::DOUBLE PRECISION - latitude) / 2) * SIN(RADIANS(zoneLatitude::DOUBLE PRECISION - latitude) / 2))
+                                )
+                            ) AS distance
+                    FROM (
+                        SELECT schl_nm                                zoneName
+                             , SPLIT_PART(ptcn_zone_rng_info, ',', 1) zoneLatitude
+                             , SPLIT_PART(ptcn_zone_rng_info, ',', 2) zoneLongitude
+                        FROM datamart.ptcn_zone_bk) zone,
+                        (
+                        SELECT id
+                             , (substr(bgng_brnch, position(',' IN bgng_brnch) + 1)::DOUBLE PRECISION
+                                + substr(end_brnch, position(',' IN end_brnch) + 1)::DOUBLE PRECISION  )/2 longitude
+                             , (substr(bgng_brnch, 0, position(',' IN bgng_brnch))::DOUBLE PRECISION
+                                + substr(end_brnch, 0, position(',' IN end_brnch))::DOUBLE PRECISION )/2 latitude
+                        FROM  (
+                                SELECT Max(id)            id
+                                     , MAX(bgng_brnch) bgng_brnch
+                                     , MAX(end_brnch)   end_brnch
+                                     , onwy_pang_road_rng
+                                FROM datamart.onwy_pang_road
+                                GROUP BY onwy_pang_road_rng
+                              ) facility
+                        ) a
+                ) ct
+        WHERE distance <![CDATA[ < ]]> #{distance}::DOUBLE PRECISION
+        GROUP BY ct.zoneName, ct.id
+            ) countTable
+            GROUP BY schl_nm
+            ORDER BY schl_nm
+        )
+        SELECT  max, avg, min
+             , (SELECT coalesce(string_agg(distinct schl_nm, ', '),'-') schlNm
+                FROM TEMP_TABLE
+             )                                                          as includeZone
+             , (SELECT coalesce(string_agg(distinct A.schlNm, ', '),'-') schlNm
+                FROM (
+                    SELECT schl_nm schlNm
+                    FROM datamart.ptcn_zone_bk
+                    EXCEPT SELECT DISTINCT TEMP_TABLE.schl_nm
+                    FROM TEMP_TABLE INNER JOIN datamart.ptcn_zone_bk ON datamart.ptcn_zone_bk.schl_nm = TEMP_TABLE.schl_nm
+                ) A
+             )                                                          as missZone
+            , (SELECT coalesce(string_agg(schl_nm, ', '),'-')
+               FROM TEMP_TABLE
+               WHERE count = result.max
+            )                                                           as maxZone
+            , (SELECT coalesce(string_agg(schl_nm, ', '),'-') schlNm
+               FROM TEMP_TABLE
+               WHERE count = result.min
+            )                                                           as minZone
+            , (SELECT COUNT(*) FROM TEMP_TABLE)                         as includeZoneCount
+            , (ptcnCount - (SELECT COUNT(*) FROM TEMP_TABLE))           as missZoneCount
+            , (SELECT COUNT(*) FROM (
+                   SELECT MAX(id), onwy_pang_road_rng FROM datamart.onwy_pang_road GROUP BY onwy_pang_road_rng
+               ) facility
+            )                                                           as totalCount
+        FROM (
+            SELECT coalesce(MAX(T.count),0)             as max
+                 , coalesce(ROUND(AVG(T.count), 1),0)   as avg
+                 , coalesce(MIN(T.count)  ,0)           as min
+                 , (SELECT COUNT(distinct schl_nm) FROM datamart.ptcn_zone_bk) as ptcnCount
+            FROM TEMP_TABLE T
+        ) result
+
+    </select>
+
+    <!-- 교차로 비교 정보 -->
+    <select id="crossRoadCompareInformation" parameterType="tvCommonSearchCondition" resultType="egovMap">
+        WITH TEMP_TABLE AS (
+            SELECT zoneName schl_nm
+                 , COUNT(*) count
+            FROM (
+                SELECT zoneName
+                     , id
+                FROM (
+                    SELECT zoneName
+                         , a.id
+                         , ( 6371 * 2 * ASIN(
+                                SQRT(
+                                    SIN(RADIANS(zoneLongitude::DOUBLE PRECISION - longitude) / 2) * SIN(RADIANS(zoneLongitude::DOUBLE PRECISION - longitude) / 2) +
+                                    COS(RADIANS(longitude)) * COS(RADIANS(zoneLongitude::DOUBLE PRECISION)) *
+                                    SIN(RADIANS(zoneLatitude::DOUBLE PRECISION - latitude) / 2) * SIN(RADIANS(zoneLatitude::DOUBLE PRECISION - latitude) / 2))
+                                )
+                            ) AS distance
+                    FROM (
+                        SELECT schl_nm                                zoneName
+                             , SPLIT_PART(ptcn_zone_rng_info, ',', 1) zoneLatitude
+                             , SPLIT_PART(ptcn_zone_rng_info, ',', 2) zoneLongitude
+                        FROM datamart.ptcn_zone_bk) zone,
+                        (
+                        SELECT id
+                             , SUBSTR(crsrd_rng_info, 0, POSITION(',' IN crsrd_rng_info))::DOUBLE PRECISION  latitude
+                             , SUBSTR(crsrd_rng_info, POSITION(',' IN crsrd_rng_info) + 1)::DOUBLE PRECISION longitude
+                        FROM  (
+                                SELECT Max(id)             id
+                                     , MAX(crsrd_rng_info) crsrd_rng_info
+                                     , crsrd_rng
+                                FROM datamart.crsrd
+                                GROUP BY crsrd_rng
+                              ) facility
+                        ) a
+                ) ct
+        WHERE distance <![CDATA[ < ]]> #{distance}::DOUBLE PRECISION
+        GROUP BY ct.zoneName, ct.id
+            ) countTable
+            GROUP BY schl_nm
+            ORDER BY schl_nm
+        )
+        SELECT  max, avg, min
+             , (SELECT coalesce(string_agg(distinct schl_nm, ', '),'-') schlNm
+                FROM TEMP_TABLE
+             )                                                          as includeZone
+             , (SELECT coalesce(string_agg(distinct A.schlNm, ', '),'-') schlNm
+                FROM (
+                    SELECT schl_nm schlNm
+                    FROM datamart.ptcn_zone_bk
+                    EXCEPT SELECT DISTINCT TEMP_TABLE.schl_nm
+                    FROM TEMP_TABLE INNER JOIN datamart.ptcn_zone_bk ON datamart.ptcn_zone_bk.schl_nm = TEMP_TABLE.schl_nm
+                ) A
+             )                                                          as missZone
+            , (SELECT coalesce(string_agg(schl_nm, ', '),'-')
+               FROM TEMP_TABLE
+               WHERE count = result.max
+            )                                                           as maxZone
+            , (SELECT coalesce(string_agg(schl_nm, ', '),'-') schlNm
+               FROM TEMP_TABLE
+               WHERE count = result.min
+            )                                                           as minZone
+            , (SELECT COUNT(*) FROM TEMP_TABLE)                         as includeZoneCount
+            , (ptcnCount - (SELECT COUNT(*) FROM TEMP_TABLE))           as missZoneCount
+            , (SELECT COUNT(*) FROM (
+                  SELECT MAX(id), crsrd_rng FROM datamart.crsrd GROUP BY crsrd_rng
+               ) facility
+            )                                                           as totalCount
+        FROM (
+            SELECT coalesce(MAX(T.count),0)             as max
+                 , coalesce(ROUND(AVG(T.count), 1),0)   as avg
+                 , coalesce(MIN(T.count)  ,0)           as min
+                 , (SELECT COUNT(distinct schl_nm) FROM datamart.ptcn_zone_bk) as ptcnCount
+            FROM TEMP_TABLE T
+        ) result
+    </select>
+
+    <!-- 어린이 통학로 비교 정보 -->
+    <select id="childWaySchoolCompareInformation" parameterType="tvCommonSearchCondition" resultType="egovMap">
+
+        WITH TEMP_TABLE AS (
+            SELECT zoneName schl_nm
+                 , COUNT(*) count
+            FROM (
+                SELECT zoneName
+                     , id
+                FROM (
+                    SELECT zoneName
+                         , a.id
+                         , ( 6371 * 2 * ASIN(
+                                SQRT(
+                                    SIN(RADIANS(zoneLongitude::DOUBLE PRECISION - longitude) / 2) * SIN(RADIANS(zoneLongitude::DOUBLE PRECISION - longitude) / 2) +
+                                    COS(RADIANS(longitude)) * COS(RADIANS(zoneLongitude::DOUBLE PRECISION)) *
+                                    SIN(RADIANS(zoneLatitude::DOUBLE PRECISION - latitude) / 2) * SIN(RADIANS(zoneLatitude::DOUBLE PRECISION - latitude) / 2))
+                                )
+                            ) AS distance
+                    FROM (
+                        SELECT schl_nm                                zoneName
+                             , SPLIT_PART(ptcn_zone_rng_info, ',', 1) zoneLatitude
+                             , SPLIT_PART(ptcn_zone_rng_info, ',', 2) zoneLongitude
+                        FROM datamart.ptcn_zone_bk) zone,
+                         (
+                        SELECT id
+                             , (substr(bgng_rng, position(',' IN bgng_rng) + 1)::DOUBLE PRECISION
+                                + substr(end_rng, position(',' IN end_rng) + 1)::DOUBLE PRECISION  )/2 longitude
+                             , (substr(bgng_rng, 0, position(',' IN bgng_rng))::DOUBLE PRECISION
+                                + substr(end_rng, 0, position(',' IN end_rng))::DOUBLE PRECISION )/2 latitude
+                        FROM  (
+                                SELECT Max(id)            id
+                                     , MAX(bgng_rng) bgng_rng
+                                     , MAX(end_rng)   end_rng
+                                     , fpath_rng
+                                FROM datamart.cld_fpath
+                                GROUP BY fpath_rng
+                              ) facility
+                        ) a
+                ) ct
+        WHERE distance <![CDATA[ < ]]> #{distance}::DOUBLE PRECISION
+        GROUP BY ct.zoneName, ct.id
+            ) countTable
+            GROUP BY schl_nm
+            ORDER BY schl_nm
+        )
+        SELECT  max, avg, min
+             , (SELECT coalesce(string_agg(distinct schl_nm, ', '),'-') schlNm
+                FROM TEMP_TABLE
+             )                                                          as includeZone
+             , (SELECT coalesce(string_agg(distinct A.schlNm, ', '),'-') schlNm
+                FROM (
+                    SELECT schl_nm schlNm
+                    FROM datamart.ptcn_zone_bk
+                    EXCEPT SELECT DISTINCT TEMP_TABLE.schl_nm
+                    FROM TEMP_TABLE INNER JOIN datamart.ptcn_zone_bk ON datamart.ptcn_zone_bk.schl_nm = TEMP_TABLE.schl_nm
+                ) A
+             )                                                          as missZone
+            , (SELECT coalesce(string_agg(schl_nm, ', '),'-')
+               FROM TEMP_TABLE
+               WHERE count = result.max
+            )                                                           as maxZone
+            , (SELECT coalesce(string_agg(schl_nm, ', '),'-') schlNm
+               FROM TEMP_TABLE
+               WHERE count = result.min
+            )                                                           as minZone
+            , (SELECT COUNT(*) FROM TEMP_TABLE)                         as includeZoneCount
+            , (ptcnCount - (SELECT COUNT(*) FROM TEMP_TABLE))           as missZoneCount
+            , (SELECT COUNT(*) FROM (
+                   SELECT MAX(id), fpath_rng FROM datamart.cld_fpath GROUP BY fpath_rng
+               ) facility
+            )                                                           as totalCount
+        FROM (
+            SELECT coalesce(MAX(T.count),0)             as max
+                 , coalesce(ROUND(AVG(T.count), 1),0)   as avg
+                 , coalesce(MIN(T.count)  ,0)           as min
+                 , (SELECT COUNT(distinct schl_nm) FROM datamart.ptcn_zone_bk) as ptcnCount
+            FROM TEMP_TABLE T
+        ) result
+    </select>
+    <!-- 과속 방지턱 비교 정보 -->
+    <select id="speedBumpCompareInformation" parameterType="tvCommonSearchCondition" resultType="egovMap">
+
+        WITH TEMP_TABLE AS (
+            SELECT zoneName schl_nm
+                 , COUNT(*) count
+            FROM (
+                SELECT zoneName
+                     , id
+                FROM (
+                    SELECT zoneName
+                         , a.id
+                         , (6371 * 2 * ASIN(
+                                SQRT(
+                                    SIN(RADIANS(zoneLongitude::DOUBLE PRECISION - longitude) / 2) * SIN(RADIANS(zoneLongitude::DOUBLE PRECISION - longitude) / 2) +
+                                    COS(RADIANS(longitude)) * COS(RADIANS(zoneLongitude::DOUBLE PRECISION)) *
+                                    SIN(RADIANS(zoneLatitude::DOUBLE PRECISION - latitude) / 2) * SIN(RADIANS(zoneLatitude::DOUBLE PRECISION - latitude) / 2))
+                                )
+                         ) AS distance
+                    FROM (
+                        SELECT schl_nm                                zoneName
+                             , SPLIT_PART(ptcn_zone_rng_info, ',', 1) zoneLatitude
+                             , SPLIT_PART(ptcn_zone_rng_info, ',', 2) zoneLongitude
+                        FROM datamart.ptcn_zone_bk) zone,
+                        (
+                        SELECT id
+                             , SUBSTR(spbm_rng_info, 0, POSITION(',' IN spbm_rng_info))::DOUBLE PRECISION  latitude
+                             , SUBSTR(spbm_rng_info, POSITION(',' IN spbm_rng_info) + 1)::DOUBLE PRECISION longitude
+                        FROM  (
+                                SELECT Max(id)            id
+                                     , MAX(spbm_rng_info) spbm_rng_info
+                                     ,  spbm_rng
+                                FROM datamart.ovrs_spbm
+                                GROUP BY spbm_rng
+                              ) facility) a
+                ) ct
+        WHERE distance <![CDATA[ < ]]> #{distance}::DOUBLE PRECISION
+        GROUP BY ct.zoneName, ct.id
+            ) countTable
+            GROUP BY schl_nm
+            ORDER BY schl_nm
+        )
+        SELECT  max, avg, min
+             , (SELECT coalesce(string_agg(distinct schl_nm, ', '),'-') schlNm
+                FROM TEMP_TABLE
+             )                                                          as includeZone
+             , (SELECT coalesce(string_agg(distinct A.schlNm, ', '),'-') schlNm
+                FROM (
+                    SELECT schl_nm schlNm
+                    FROM datamart.ptcn_zone_bk
+                    EXCEPT SELECT DISTINCT TEMP_TABLE.schl_nm
+                    FROM TEMP_TABLE INNER JOIN datamart.ptcn_zone_bk ON datamart.ptcn_zone_bk.schl_nm = TEMP_TABLE.schl_nm
+                ) A
+             )                                                          as missZone
+            , (SELECT coalesce(string_agg(schl_nm, ', '),'-')
+               FROM TEMP_TABLE
+               WHERE count = result.max
+            )                                                           as maxZone
+            , (SELECT coalesce(string_agg(schl_nm, ', '),'-') schlNm
+               FROM TEMP_TABLE
+               WHERE count = result.min
+            )                                                           as minZone
+            , (SELECT COUNT(*) FROM TEMP_TABLE)                         as includeZoneCount
+            , (ptcnCount - (SELECT COUNT(*) FROM TEMP_TABLE))           as missZoneCount
+            , (SELECT COUNT(*) FROM (
+                   SELECT MAX(id), spbm_rng FROM datamart.ovrs_spbm GROUP BY spbm_rng
+               ) facility
+            )                                                           as totalCount
+        FROM (
+            SELECT coalesce(MAX(T.count),0)             as max
+                 , coalesce(ROUND(AVG(T.count), 1),0)   as avg
+                 , coalesce(MIN(T.count)  ,0)           as min
+                 , (SELECT COUNT(distinct schl_nm) FROM datamart.ptcn_zone_bk) as ptcnCount
+            FROM TEMP_TABLE T
+        ) result
+    </select>
+    <!-- 펜스 비교 정보 -->
+    <select id="fenceCompareInformation" parameterType="tvCommonSearchCondition" resultType="egovMap">
+
+        WITH TEMP_TABLE AS (
+            SELECT zoneName schl_nm
+                 , COUNT(*) count
+            FROM (
+                SELECT zoneName
+                     , id
+                FROM (
+                    SELECT zoneName
+                         , a.id
+                         , ( 6371 * 2 * ASIN(
+                                SQRT(
+                                    SIN(RADIANS(zoneLongitude::DOUBLE PRECISION - longitude) / 2) * SIN(RADIANS(zoneLongitude::DOUBLE PRECISION - longitude) / 2) +
+                                    COS(RADIANS(longitude)) * COS(RADIANS(zoneLongitude::DOUBLE PRECISION)) *
+                                    SIN(RADIANS(zoneLatitude::DOUBLE PRECISION - latitude) / 2) * SIN(RADIANS(zoneLatitude::DOUBLE PRECISION - latitude) / 2))
+                                )
+                            ) AS distance
+                    FROM (
+                        SELECT schl_nm                                zoneName
+                             , SPLIT_PART(ptcn_zone_rng_info, ',', 1) zoneLatitude
+                             , SPLIT_PART(ptcn_zone_rng_info, ',', 2) zoneLongitude
+                        FROM datamart.ptcn_zone_bk) zone,
+                         (
+                        SELECT id
+                              , (substr(startlocation, position(',' IN startlocation) + 1)::DOUBLE PRECISION
+                                + substr(endlocation, position(',' IN endlocation) + 1)::DOUBLE PRECISION  )/2 longitude
+                              , (substr(startlocation, 0, position(',' IN startlocation))::DOUBLE PRECISION
+                                + substr(endlocation, 0, position(',' IN endlocation))::DOUBLE PRECISION )/2 latitude
+                        FROM  (
+                                SELECT Max(id)            id
+                                     , MAX(startlocation) startlocation
+                                     , MAX(endlocation)   endlocation
+                                     , area5186
+                                FROM datamart.prt_fece
+                                GROUP BY area5186
+                              ) facility
+                        ) a
+                ) ct
+        WHERE distance <![CDATA[ < ]]> #{distance}::DOUBLE PRECISION
+        GROUP BY ct.zoneName, ct.id
+            ) countTable
+            GROUP BY schl_nm
+            ORDER BY schl_nm
+        )
+        SELECT  max, avg, min
+             , (SELECT coalesce(string_agg(distinct schl_nm, ', '),'-') schlNm
+                FROM TEMP_TABLE
+             )                                                          as includeZone
+             , (SELECT coalesce(string_agg(distinct A.schlNm, ', '),'-') schlNm
+                FROM (
+                    SELECT schl_nm schlNm
+                    FROM datamart.ptcn_zone_bk
+                    EXCEPT SELECT DISTINCT TEMP_TABLE.schl_nm
+                    FROM TEMP_TABLE INNER JOIN datamart.ptcn_zone_bk ON datamart.ptcn_zone_bk.schl_nm = TEMP_TABLE.schl_nm
+                ) A
+             )                                                          as missZone
+            , (SELECT coalesce(string_agg(schl_nm, ', '),'-')
+               FROM TEMP_TABLE
+               WHERE count = result.max
+            )                                                           as maxZone
+            , (SELECT coalesce(string_agg(schl_nm, ', '),'-') schlNm
+               FROM TEMP_TABLE
+               WHERE count = result.min
+            )                                                           as minZone
+            , (SELECT COUNT(*) FROM TEMP_TABLE)                         as includeZoneCount
+            , (ptcnCount - (SELECT COUNT(*) FROM TEMP_TABLE))           as missZoneCount
+            , (SELECT COUNT(*) FROM (
+                    SELECT MAX(id) area5186 FROM datamart.prt_fece GROUP BY area5186
+                ) facility
+              )                                                          as totalCount
+        FROM (
+            SELECT coalesce(MAX(T.count),0)             as max
+                 , coalesce(ROUND(AVG(T.count), 1),0)   as avg
+                 , coalesce(MIN(T.count)  ,0)           as min
+                 , (SELECT COUNT(distinct schl_nm) FROM datamart.ptcn_zone_bk) as ptcnCount
+            FROM TEMP_TABLE T
+        ) result
+    </select>
+</mapper>

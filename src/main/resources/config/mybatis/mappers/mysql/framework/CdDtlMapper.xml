@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.jcms.framework.cd.mapper.CdDtlMapper">
+
+	<sql id="tb"> JCMS_CD_DTL </sql>
+	<sql id="jtb"> JCMS_CD_DTL </sql>
+	<sql id="s">
+		SELECT CD_DTL_ID, CD_ID, CD_DTL_NM, CD_DTL_LABEL, CD_DTL_ORD, CD_DTL_DESC, REC_ST, REG_ID, REG_DT, UPD_ID, UPD_DT
+	</sql>
+	<sql id="l">
+		SELECT CD_DTL_ID, CD_ID, CD_DTL_NM, CD_DTL_LABEL, CD_DTL_ORD, CD_DTL_DESC, REC_ST
+	</sql>
+	<sql id="sf"> FROM <include refid="tb"/> </sql>
+	<sql id="lf"> FROM <include refid="jtb"/> </sql>
+	<sql id="sw">
+		WHERE DEL_DT IS NULL
+			AND CD_DTL_ID = #{cdDtlId}
+			AND CD_ID = #{cdId}
+	</sql>
+	<sql id="lw">
+		WHERE DEL_DT IS NULL
+			<if test="!empty(cdId)"> AND CD_ID = #{cdId,jdbcType=VARCHAR} </if>
+			<if test="!empty(recSt)"> AND REC_ST = #{recSt} </if>
+	</sql>
+	<sql id="ord">
+		<if test="!empty(sort) and !empty(sortOrd)"> ORDER BY ${sort} ${sortOrd}</if>
+		<if test="pagingYn == true"> limit #{start}, #{length} </if>
+	</sql>
+
+
+	<select id="select" parameterType="cdDtl" resultType="cdDtl">
+		<include refid="s"/>
+		<include refid="sf"/>
+		<include refid="sw"/>
+	</select>
+
+	<select id="selectList" parameterType="cdDtl" resultType="cdDtl">
+		<include refid="l"/>
+		<include refid="lf"/>
+		<include refid="lw"/>
+		<include refid="ord"/>
+	</select>
+	
+	<select id="count" parameterType="cdDtl" resultType="java.lang.Integer">
+		SELECT COUNT(CD_DTL_ID)
+		<include refid="lf"/>
+		<include refid="lw"/>
+	</select>
+	
+	<select id="countChek" parameterType="cdDtl" resultType="java.lang.Integer">
+		SELECT COUNT(CD_DTL_ID)
+		<include refid="sf"/>
+		WHERE DEL_DT IS NULL
+		<if test="!empty(cdId)"> AND CD_ID = #{cdId} </if>
+	</select>
+	
+	<select id="existCount" parameterType="cdDtl" resultType="java.lang.Integer">
+		SELECT COUNT(CD_DTL_ID)
+		<include refid="sf"/>
+		WHERE DEL_DT IS NULL
+			AND CD_ID = #{cdId}
+			AND (CD_DTL_ID = #{cdDtlId} OR CD_DTL_NM = #{cdDtlNm})
+	</select>
+
+	<insert id="insert" parameterType="cdDtl">
+		INSERT INTO <include refid="tb"/> (
+			CD_DTL_ID, CD_ID, CD_DTL_NM, CD_DTL_LABEL, CD_DTL_ORD, CD_DTL_DESC, REC_ST, REG_ID, REG_DT
+		) VALUES (
+			#{cdDtlId}, #{cdId}, #{cdDtlNm}, #{cdDtlLabel}, #{cdDtlOrd}, #{cdDtlDesc}, #{recSt}, #{regId}, SYSDATE()
+		)
+	</insert>
+	
+	<update id="update" parameterType="cdDtl">
+		UPDATE <include refid="tb"/>
+		SET <include refid="BaseSql.Update"/>
+		    , CD_DTL_NM = #{cdDtlNm}
+			, CD_DTL_LABEL = #{cdDtlLabel}
+			, CD_DTL_ORD = #{cdDtlOrd}
+			, CD_DTL_DESC = #{cdDtlDesc}
+			, REC_ST = #{recSt}
+		WHERE CD_ID = #{cdId}
+		    AND CD_DTL_ID = #{cdDtlId}
+		    AND DEL_DT IS NULL
+	</update>
+	
+	<delete id="delete" parameterType="cdDtl">
+		DELETE FROM <include refid="tb"/>
+		WHERE CD_ID = #{cdId}
+			AND CD_DTL_ID = #{cdDtlId}
+	</delete>
+
+</mapper>

@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.datahub.martData.mapper.DthTrnsAcdntRngInfoMapper">
+	<!-- ### 메크로 정의 -->
+	<sql id="tb"> datamart.dth_trns_acdnt_rng_info </sql>
+	<sql id="s"> select * </sql>
+	<sql id="sl"> select 
+		id,
+		dat_st_id,
+		crt_dt,
+		mdfcn_dt,
+		ocrn_dt_yr,
+		ocrn_dt_mm_day_hr,
+		ocrn_dt_dn_se_cd,
+		ocrn_dt_ddwk_cd,
+		ocrn_dt_crt_dt,
+		ocrn_dt_mdfcn_dt,
+		dcsd_cnt,
+		injpsn_cnt,
+		swsn_cnt,
+		sijn_cnt,
+		inj_dcl_cnt,
+		dmge_info_crt_dt,
+		dmge_info_mdfcn_dt,
+		ctpv_cd,
+		sgg_cd,
+		acdnt_lclsf_cd,
+		acdnt_mclsf_cd,
+		acdnt_cd,
+		vltn_cd,
+		road_lclsf_cd,
+		road_cd,
+		ar_vhcl_cd,
+		vm_vhcl_cd,
+		cd_info_crt_dt,
+		cd_info_mdfcn_dt,
+		rng_crd,
+		rng_crd_crt_dt,
+		rng_crd_mdfcn_dt,
+		lot_lat_crd,
+		lot_lat_crd_crt_dt,
+		lot_lat_crd_mdfcn_dt
+	</sql>
+	<sql id="f"> from <include refid="tb"/> </sql>
+	<sql id="lw">
+		<where>
+			<if test="!empty(recSt)"> and REC_ST = #{recSt} </if>
+			<include refid="BaseSql.BaseWhere"/>
+		</where>
+	</sql>
+	<sql id="fw">
+		<where>
+			and id = #{id}
+			<include refid="BaseSql.BaseWhere"/>
+		</where>
+	</sql>
+	<sql id="ord">
+		<if test="empty(sort)"> order by id </if>
+		<if test="!empty(sort)"> order by ${sort} </if>
+		<if test="!empty(sortOrd)"> ${sortOrd} </if>
+		<if test="pagingYn == true" > limit #{start}, #{length}	</if>
+	</sql>
+	<!-- ### Select -->
+	<select id="select" parameterType="dthTrnsAcdntRngInfo" resultType="dthTrnsAcdntRngInfo">
+		<include refid="s"/>
+		<include refid="f"/>
+		<include refid="fw"/>
+	</select>
+
+	<!-- ### selectList -->
+	<select id="selectList" parameterType="dthTrnsAcdntRngInfo" resultType="dthTrnsAcdntRngInfo">
+		<include refid="sl"/>
+		<include refid="f"/>
+		<include refid="lw"/>
+		<include refid="ord"/>
+	</select>
+	<!-- ### Count -->
+	<select id="count" parameterType="dthTrnsAcdntRngInfo" resultType="java.lang.Integer">
+		select COUNT(*)
+		<include refid="f"/>
+		<include refid="lw"/>
+	</select>
+	<!-- ### Insert -->
+	<insert id="insert" parameterType="dthTrnsAcdntRngInfo" >
+		insert into dth_trns_acdnt_rng_info (
+			id,
+			dat_st_id,
+			crt_dt,
+			mdfcn_dt,
+			ocrn_dt_yr,
+			ocrn_dt_mm_day_hr,
+			ocrn_dt_dn_se_cd,
+			ocrn_dt_ddwk_cd,
+			ocrn_dt_crt_dt,
+			ocrn_dt_mdfcn_dt,
+			dcsd_cnt,
+			injpsn_cnt,
+			swsn_cnt,
+			sijn_cnt,
+			inj_dcl_cnt,
+			dmge_info_crt_dt,
+			dmge_info_mdfcn_dt,
+			ctpv_cd,
+			sgg_cd,
+			acdnt_lclsf_cd,
+			acdnt_mclsf_cd,
+			acdnt_cd,
+			vltn_cd,
+			road_lclsf_cd,
+			road_cd,
+			ar_vhcl_cd,
+			vm_vhcl_cd,
+			cd_info_crt_dt,
+			cd_info_mdfcn_dt,
+			rng_crd,
+			rng_crd_crt_dt,
+			rng_crd_mdfcn_dt,
+			lot_lat_crd,
+			lot_lat_crd_crt_dt,
+			lot_lat_crd_mdfcn_dt
+			<include refid="BaseSql.InRegRecStPrm"/>
+		) values (
+			#{id},
+			#{datStId},
+			#{crtDt},
+			#{mdfcnDt},
+			#{ocrnDtYr},
+			#{ocrnDtMmDayHr},
+			#{ocrnDtDnSeCd},
+			#{ocrnDtDdwkCd},
+			#{ocrnDtCrtDt},
+			#{ocrnDtMdfcnDt},
+			#{dcsdCnt},
+			#{injpsnCnt},
+			#{swsnCnt},
+			#{sijnCnt},
+			#{injDclCnt},
+			#{dmgeCrtDt},
+			#{dmgeMdfcnDt},
+			#{ctpvCd},
+			#{sggCd},
+			#{acdntLclsfCd},
+			#{acdntMclsfCd},
+			#{acdntCd},
+			#{vltnCd},
+			#{roadLclsfCd},
+			#{roadCd},
+			#{arVhclCd},
+			#{vmVhclCd},
+			#{cdInfoCrtDt},
+			#{cdInfoMdfcnDt},
+			#{rngCrd},
+			#{rngCrdCrtDt},
+			#{rngCrdMdfcnDt},
+			#{lotLatCrd},
+			#{lotLatCrdCrtDt},
+			#{lotLatCrdMdfcnDt}
+			<include refid="BaseSql.InRegRecStVal"/>
+		)
+	</insert>
+
+	<!-- ### update -->
+	<update id="update" parameterType="dthTrnsAcdntRngInfo">
+		update <include refid="tb"/> set
+			dat_st_id= #{datStId}
+			<if test="isNotNull(crtDt)" > , crt_dt= #{crtDt} </if>
+			<if test="isNotNull(mdfcnDt)" > , mdfcn_dt= #{mdfcnDt} </if>
+			<if test="isNotNull(ocrnDtYr)" > , ocrn_dt_yr= #{ocrnDtYr} </if>
+			<if test="isNotNull(ocrnDtMmDayHr)" > , ocrn_dt_mm_day_hr= #{ocrnDtMmDayHr} </if>
+			<if test="isNotNull(ocrnDtDnSeCd)" > , ocrn_dt_dn_se_cd= #{ocrnDtDnSeCd} </if>
+			<if test="isNotNull(ocrnDtDdwkCd)" > , ocrn_dt_ddwk_cd= #{ocrnDtDdwkCd} </if>
+			<if test="isNotNull(ocrnDtCrtDt)" > , ocrn_dt_crt_dt= #{ocrnDtCrtDt} </if>
+			<if test="isNotNull(ocrnDtMdfcnDt)" > , ocrn_dt_mdfcn_dt= #{ocrnDtMdfcnDt} </if>
+			<if test="isNotNull(dcsdCnt)" > , dcsd_cnt= #{dcsdCnt} </if>
+			<if test="isNotNull(injpsnCnt)" > , injpsn_cnt= #{injpsnCnt} </if>
+			<if test="isNotNull(swsnCnt)" > , swsn_cnt= #{swsnCnt} </if>
+			<if test="isNotNull(sijnCnt)" > , sijn_cnt= #{sijnCnt} </if>
+			<if test="isNotNull(injDclCnt)" > , inj_dcl_cnt= #{injDclCnt} </if>
+			<if test="isNotNull(dmgeCrtDt)" > , dmge_info_crt_dt= #{dmgeCrtDt} </if>
+			<if test="isNotNull(dmgeMdfcnDt)" > , dmge_info_mdfcn_dt= #{dmgeMdfcnDt} </if>
+			<if test="isNotNull(ctpvCd)" > , ctpv_cd= #{ctpvCd} </if>
+			<if test="isNotNull(sggCd)" > , sgg_cd= #{sggCd} </if>
+			<if test="isNotNull(acdntLclsfCd)" > , acdnt_lclsf_cd= #{acdntLclsfCd} </if>
+			<if test="isNotNull(acdntMclsfCd)" > , acdnt_mclsf_cd= #{acdntMclsfCd} </if>
+			<if test="isNotNull(acdntCd)" > , acdnt_cd= #{acdntCd} </if>
+			<if test="isNotNull(vltnCd)" > , vltn_cd= #{vltnCd} </if>
+			<if test="isNotNull(roadLclaCd)" > , road_lclsf_cd= #{roadLclsfCd} </if>
+			<if test="isNotNull(roadCd)" > , road_cd= #{roadCd} </if>
+			<if test="isNotNull(arVhclCd)" > , ar_vhcl_cd= #{arVhclCd} </if>
+			<if test="isNotNull(vmVhclCd)" > , vm_vhcl_cd= #{vmVhclCd} </if>
+			<if test="isNotNull(cdInfoCrtDt)" > , cd_info_crt_dt= #{cdInfoCrtDt} </if>
+			<if test="isNotNull(cdInfoMdfcnDt)" > , cd_info_mdfcn_dt= #{cdInfoMdfcnDt} </if>
+			<if test="isNotNull(rngCrd)" > , rng_crd= #{rngCrd} </if>
+			<if test="isNotNull(rngCrdCrtDt)" > , rng_crd_crt_dt= #{rngCrdCrtDt} </if>
+			<if test="isNotNull(rngCrdMdfcnDt)" > , rng_crd_mdfcn_dt= #{rngCrdMdfcnDt} </if>
+			<if test="isNotNull(lotLatCrd)" > , lot_lat_crd= #{lotLatCrd} </if>
+			<if test="isNotNull(lotLatCrdCrtDt)" > , lot_lat_crd_crt_dt= #{lotLatCrdCrtDt} </if>
+			<if test="isNotNull(lotLatCrdMdfcnDt)" > , lot_lat_crd_mdfcn_dt= #{lotLatCrdMdfcnDt} </if>
+			<include refid="BaseSql.Update" />
+			<include refid="fw"/>
+	</update>
+
+	<!-- ### delete -->
+	<update id="delete" parameterType="dthTrnsAcdntRngInfo" >
+		update <include refid="tb"/> set
+		<include refid="BaseSql.Delete" />
+		<include refid="fw"/>
+	</update>
+</mapper>

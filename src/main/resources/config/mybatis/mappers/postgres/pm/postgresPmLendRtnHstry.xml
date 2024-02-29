@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.datahub.pm.mapper.PostgresPmLendRtnHstryMapper">
+    <select id="selectPostgresPmLendRtnHstryList" resultMap="PmLendRtnHstryResultMap">
+        SELECT
+            a.ID AS id
+          , a.mbr_no AS mbr_no
+          , a.kckbrd_id AS kckbrd_id
+          , COALESCE(CAST(split_part(a.lend_brnch, ',', 1) AS double precision), 0) AS spoint_x
+          , COALESCE(CAST(split_part(a.lend_brnch, ',', 2) AS double precision), 0) AS spoint_y
+          , COALESCE(CAST(split_part(a.rtn_brnch, ',', 1) AS double precision), 0) AS epoint_x
+          , COALESCE(CAST(split_part(a.rtn_brnch, ',', 2) AS double precision), 0) AS epoint_y
+          , a.lend_dt AS lend_dt
+          , a.rtn_dt AS rtn_dt
+        FROM datamart.lend_rtn_hstry AS a
+    </select>
+
+    <resultMap id="PmLendRtnHstryResultMap" type="PmLendRtnHstry">
+        <id property="id" column="id" />
+        <result property="mbr_no" column="mbr_no" />
+        <result property="kckbrd_id" column="kckbrd_id" />
+        <result property="spoint_x" column="spoint_x" />
+        <result property="spoint_y" column="spoint_y" />
+        <result property="epoint_x" column="epoint_x" />
+        <result property="epoint_y" column="epoint_y" />
+        <result property="lend_dt" column="lend_dt" />
+        <result property="rtn_dt" column="rtn_dt" />
+    </resultMap>
+</mapper>

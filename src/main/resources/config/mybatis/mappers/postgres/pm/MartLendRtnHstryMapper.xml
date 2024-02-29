@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.datahub.martLendRtnHstry.mapper.MartLendRtnHstryMapper">
+	<!-- ### 메크로 정의 -->
+	<!-- ### selectList -->
+	<select id="selectList" parameterType="martLendRtnHstry" resultType="martLendRtnHstry">
+		select
+			id,
+			dat_st_id,
+			crt_dt,
+			mdfcn_dt,
+			mbr_no,
+			mbr_no_crt_dt,
+			mbr_no_mdfcn_dt,
+			kckbrd_id,
+			kckbrd_id_crt_dt,
+			kckbrd_id_mdfcn_dt,
+			lend_brnch,
+			lend_brnch_crt_dt,
+			lend_brnch_mdfcn_dt,
+			rtn_brnch,
+			rtn_brnch_crt_dt,
+			rtn_brnch_mdfcn_dt,
+			lend_dt,
+			rtn_dt,
+			lend_rtn_dat_crt_dt,
+			lend_rtn_dat_mdfcn_dt,
+			oper_co,
+		    oper_co_crt_dt,
+		    oper_co_mdfcn_dt,
+		    kckbrd_kd,
+		    kckbrd_kd_crt_dt,
+		    kckbrd_kd_mdfcn_dt
+		from datamart.lend_rtn_hstry
+		<where>
+			<if test="isNotNull(crtDt)" > crt_dt > #{crtDt} </if>
+		</where>
+		order by crt_dt
+	</select>
+
+</mapper>

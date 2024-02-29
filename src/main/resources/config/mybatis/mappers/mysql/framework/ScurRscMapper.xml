@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.jcms.framework.security.mapper.ScurRscMapper">
+
+	<sql id="tb"> JCMS_SCUR_RSC </sql>
+	<sql id="jtb"> JCMS_SCUR_RSC </sql>
+	<sql id="s"> SELECT * </sql>
+	<sql id="l">
+		SELECT RSC_ID, RSC_NM, RSC_TP, RSC_PATN, RSC_DESC, REG_ID, REG_DT, UPD_ID, UPD_DT
+	</sql>
+	<sql id="sf"> FROM <include refid="tb"/> </sql>
+	<sql id="lf"> FROM <include refid="jtb"/> </sql>
+	<sql id="sw">
+		WHERE 1 = 1
+	</sql>
+	<sql id="lw">
+		WHERE 1 = 1
+			<if test="!empty(rscId)" > AND RSC_ID = #{rscId} </if>
+	</sql>
+	<sql id="ord">
+		<if test="!empty(sort) and !empty(sortOrd)"> ORDER BY ${sort} ${sortOrd} </if>
+		<if test="pagingYn == true"> limit #{start}, #{length} </if>
+	</sql>
+
+
+	<select id="selectList" parameterType="scurRsc" resultType="scurRsc">
+		<include refid="l"/>
+		<include refid="lf"/>
+		<include refid="lw"/>
+		<include refid="ord"/>
+	</select>
+	
+	<select id="count" parameterType="scurRsc" resultType="java.lang.Integer">
+		SELECT COUNT(RSC_ID)
+		<include refid="lf"/>
+		<include refid="lw"/>
+	</select>
+	
+	<insert id="insert" parameterType="scurRsc">
+		INSERT INTO <include refid="tb"/> (
+			RSC_ID, RSC_NM, RSC_TP, RSC_PATN, RSC_DESC, REG_ID, REG_DT
+		) VALUES (
+			#{rscId}, #{rscNm}, #{rscTp}, #{rscPatn}, #{rscDesc}, #{regId}, SYSDATE()
+		)
+	</insert>
+	
+	<update id="update" parameterType="scurRsc">
+		UPDATE <include refid="tb"/>
+		SET <include refid="BaseSql.Update"/>
+			, RSC_ID = #{rscId}
+			, RSC_NM = #{rscNm}
+			, RSC_TP = #{rscTp}
+			, RSC_PATN = #{rscPatn}
+			, RSC_DESC = #{rscDesc}
+		WHERE RSC_ID = #{rscId}
+	</update>
+	
+	<delete id="delete" parameterType="scurRsc">
+		DELETE FROM <include refid="tb"/>
+		WHERE RSC_ID = #{rscId}
+	</delete>
+
+</mapper>

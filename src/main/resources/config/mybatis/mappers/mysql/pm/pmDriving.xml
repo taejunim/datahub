@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.pm.mapper.PmDrivingMapper">
+    <select id="selectList4Map" parameterType="pmDrivingSearch" resultType="egovMap">
+        SELECT
+        a.ID AS id
+        , a.OPER AS oper
+        , a.PM_TYPE AS pm_type
+        , a.MBR_NO AS mbr_no
+        , a.KCKBRD_ID AS kckbrd_id
+        , a.LEND_DT AS lend_dt
+        , a.RENT_SPOT AS rent_spot
+        , a.RTN_DT AS rtn_dt
+        , a.RETURN_SPOT AS return_spot
+        , a.ILLE_PARK AS ille_park
+        FROM pm_lend_rtn_hstry AS a
+        <where>
+            1=1
+            <if test="operator != null and operator != ''">
+                <choose>
+                    <when test="operator == 'none'">
+                        AND oper is null
+                    </when>
+                    <otherwise>
+                        AND oper = #{operator}
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="isIPChecked != null">
+                <if test="isIPChecked">
+                    AND ille_park = 1
+                </if>
+            </if>
+            <choose>
+                <when test="retf != null and retf == 'rent'">
+                    <if test="startSearchDt != null and endSearchDt != null">
+                        AND lend_dt BETWEEN #{startSearchDt} AND #{endSearchDt}
+                    </if>
+                    <![CDATA[ ORDER BY lend_dt DESC ]]>
+                </when>
+                <when test="retf != null and retf == 'return'">
+                    <if test="startSearchDt != null and endSearchDt != null">
+                        AND rtn_dt BETWEEN #{startSearchDt} AND #{endSearchDt}
+                    </if>
+                    <![CDATA[ ORDER BY rtn_dt DESC ]]>
+                </when>
+                <otherwise>
+                    <if test="startSearchDt != null and endSearchDt != null">
+                        AND rtn_dt BETWEEN #{startSearchDt} AND #{endSearchDt}
+                        AND lend_dt BETWEEN #{startSearchDt} AND #{endSearchDt}
+                    </if>
+                </otherwise>
+            </choose>
+        </where>
+    </select>
+
+    <select id="selectOpers" resultType="String">
+        select distinct oper from pm_lend_rtn_hstry where oper IS NOT NULL
+    </select>
+</mapper>

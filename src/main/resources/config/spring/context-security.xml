@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:egov-security="http://www.egovframe.go.kr/schema/egov-security"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd
+		http://www.egovframe.go.kr/schema/egov-security http://www.egovframe.go.kr/schema/egov-security/egov-security-3.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+	<http pattern="/css/＊＊" security="none" />
+	<http pattern="/images/＊＊" security="none" />
+	<http pattern="/js/＊＊" security="none" />
+	<http pattern="\A/WEB-INF/view/.*\Z" request-matcher="regex" security="none" />
+
+	<http access-denied-page="/error/error.mng?errorCode=403" request-matcher="regex">
+		<!-- form-login login-processing-url="/j_spring_security_check" authentication-failure-url="/login/loginForm.mng?login_error=1"
+			default-target-url="/index.jsp?flag=L" login-page="/login/loginForm.mng" /> -->
+		<form-login  
+			default-target-url="/pm/gis/gis.mng" login-page="/login/loginForm.mng"
+			authentication-success-handler-ref="customAuthenticationSuccessHandler"
+			authentication-failure-handler-ref="customAuthenticationFailureHandler" />
+		<!-- anonymous /> -->
+		
+		<logout logout-success-url="/login/loginForm.mng" />
+
+		<!-- for authorization -->
+		<custom-filter before="FILTER_SECURITY_INTERCEPTOR" ref="filterSecurityInterceptor" />
+		
+		<!-- check session time out with ajax -->
+		<custom-filter after="EXCEPTION_TRANSLATION_FILTER" ref="ajaxSessionTimeoutFilter"/>	
+	</http>
+		
+	<beans:bean id="customAuthenticationSuccessHandler" class="net.jcms.framework.security.handler.LoginSucessHandler"/>
+	<beans:bean id="customAuthenticationFailureHandler" class="net.jcms.framework.security.handler.LoginFailureHandler"/>
+		
+	<beans:bean id="securedObjectService" class="egovframework.rte.fdl.security.securedobject.impl.SecuredObjectServiceImpl">
+		<beans:property name="securedObjectDAO" ref="securedObjectDAO" />
+		<beans:property name="requestMatcherType" value="regex" />	<!-- default : ant -->
+	</beans:bean>
+
+	<beans:bean id="securedObjectDAO" class="egovframework.rte.fdl.security.securedobject.impl.SecuredObjectDAO">
+		<beans:property name="sqlHierarchicalRoles" value="SELECT a.child_role child, a.parent_role parent FROM JCMS_ROLE_HRCY a LEFT JOIN JCMS_ROLE_HRCY b on (a.child_role = b.parent_role)" />
+		<beans:property name="sqlRolesAndUrl" value="SELECT a.RSC_PATN url, b.ROLE_AUTH authority FROM JCMS_SCUR_RSC a, JCMS_SCUR_RSC_ROLE b WHERE a.RSC_ID = b.RSC_ID AND a.RSC_TP = 'url' ORDER BY a.sort_ord" />
+		<beans:property name="sqlRolesAndMethod" value="SELECT a.RSC_PATN method, b.ROLE_AUTH authority FROM JCMS_SCUR_RSC a, JCMS_SCUR_RSC_ROLE b WHERE a.RSC_ID = b.RSC_ID AND a.RSC_TP = 'method' ORDER BY a.sort_ord" />
+		<beans:property name="sqlRolesAndPointcut" value="SELECT a.RSC_PATN pointcut, b.ROLE_AUTH authority FROM JCMS_SCUR_RSC a, JCMS_SCUR_RSC_ROLE b WHERE a.RSC_ID = b.RSC_ID AND a.RSC_TP = 'pointcut' ORDER BY a.sort_ord" />
+		<beans:property name="dataSource" ref="dataSource-mysql" />
+	</beans:bean>
+
+	<beans:bean id="roleHierarchy" class="org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl">
+		<beans:property name="hierarchy" ref="hierarchyStrings" />
+	</beans:bean>
+
+	<beans:bean id="hierarchyStrings" class="egovframework.rte.fdl.security.userdetails.hierarchicalroles.HierarchyStringsFactoryBean"
+		init-method="init">
+		<beans:property name="securedObjectService" ref="securedObjectService" />
+	</beans:bean>
+
+	<beans:bean id="filterSecurityInterceptor" class="org.springframework.security.web.access.intercept.FilterSecurityInterceptor">
+		<beans:property name="authenticationManager" ref="org.springframework.security.authenticationManager" />
+		<beans:property name="accessDecisionManager" ref="org.springframework.security.access.vote.AffirmativeBased#0" />
+		<beans:property name="securityMetadataSource" ref="databaseSecurityMetadataSource" />
+	</beans:bean>
+
+	<beans:bean id="databaseSecurityMetadataSource" class="egovframework.rte.fdl.security.intercept.EgovReloadableFilterInvocationSecurityMetadataSource">
+		<beans:constructor-arg ref="requestMap" />
+		<beans:property name="securedObjectService" ref="securedObjectService" />
+	</beans:bean>
+
+	<!-- url -->
+	<beans:bean id="requestMap" class="egovframework.rte.fdl.security.intercept.UrlResourcesMapFactoryBean" init-method="init">
+		<beans:property name="securedObjectService" ref="securedObjectService" />
+	</beans:bean>
+
+	<!-- authentication-manager 기본 생성 bean id : org.springframework.security.authenticationManager (alias로 변경할 수 있음) -->
+	<authentication-manager>
+		<authentication-provider user-service-ref="jdbcUserService">
+			<!-- password-encoder hash="sha-256" base64="true" /> -->
+		</authentication-provider>
+	</authentication-manager>
+
+	<beans:bean id="jdbcUserService" class="egovframework.rte.fdl.security.userdetails.jdbc.EgovJdbcUserDetailsManager">
+		<beans:property name="usersByUsernameQuery" value="SELECT USER_ID, USER_LOGIN_ID, USER_PWD, REC_ST, USER_NM FROM JCMS_USER WHERE USER_LOGIN_ID = ? AND USER_ST='1' AND DEL_DT IS NULL"  />
+		<beans:property name="authoritiesByUsernameQuery" value="SELECT B.USER_LOGIN_ID, ROLE_AUTH FROM JCMS_USER_ROLE A, JCMS_USER B WHERE B.USER_LOGIN_ID = ? AND A.USER_ID = B.USER_ID AND USER_ST='1' AND DEL_DT IS NULL" />
+		<beans:property name="roleHierarchy" ref="roleHierarchy" />
+		<beans:property name="dataSource" ref="dataSource-mysql" />
+		<beans:property name="mapClass" value="net.jcms.framework.security.mapping.UserDetailsMapping" />
+	</beans:bean>
+
+	<!-- method -->
+	<beans:bean id="methodSecurityMetadataSourceAdvisor" class="org.springframework.security.access.intercept.aopalliance.MethodSecurityMetadataSourceAdvisor">
+		<beans:constructor-arg value="methodSecurityInterceptor" />
+		<beans:constructor-arg ref="delegatingMethodSecurityMetadataSource" />
+		<beans:constructor-arg value="delegatingMethodSecurityMetadataSource" />
+	</beans:bean>
+
+	<beans:bean id="methodSecurityInterceptor" class="org.springframework.security.access.intercept.aopalliance.MethodSecurityInterceptor">
+		<beans:property name="validateConfigAttributes" value="false" />
+		<beans:property name="authenticationManager" ref="org.springframework.security.authenticationManager" />
+		<beans:property name="accessDecisionManager" ref="org.springframework.security.access.vote.AffirmativeBased#0" />
+		<beans:property name="securityMetadataSource" ref="delegatingMethodSecurityMetadataSource" />
+	</beans:bean>
+
+	<beans:bean id="delegatingMethodSecurityMetadataSource" class="org.springframework.security.access.method.DelegatingMethodSecurityMetadataSource">
+		<beans:constructor-arg>
+			<beans:list>
+				<beans:ref bean="methodSecurityMetadataSources" />
+				<beans:bean class="org.springframework.security.access.annotation.SecuredAnnotationSecurityMetadataSource" />
+				<beans:bean class="org.springframework.security.access.annotation.Jsr250MethodSecurityMetadataSource" />
+			</beans:list>
+		</beans:constructor-arg>
+	</beans:bean>
+
+	<beans:bean id="methodSecurityMetadataSources" class="org.springframework.security.access.method.MapBasedMethodSecurityMetadataSource">
+		<beans:constructor-arg ref="methodMap" />
+	</beans:bean>
+
+	<beans:bean id="methodMap" class="egovframework.rte.fdl.security.intercept.MethodResourcesMapFactoryBean" init-method="init">
+		<beans:property name="securedObjectService" ref="securedObjectService" />
+		<beans:property name="resourceType" value="method" />
+	</beans:bean>
+	
+	<beans:bean id="ajaxSessionTimeoutFilter" class="net.jcms.framework.security.filter.SpringSecurityAjaxFilter">
+		<beans:property name="ajaxHeader" value="AJAX" />
+	</beans:bean>
+	
+</beans:beans>

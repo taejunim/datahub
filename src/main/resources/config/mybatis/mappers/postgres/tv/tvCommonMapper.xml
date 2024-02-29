@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.datahub.tv.common.mapper.TvCommonMapper">
+    <select id="safetyAreaInformation" parameterType="tvCommonSearchCondition" resultType="egovMap">
+        SELECT MAX(id)                  AS id
+             , MAX(dat_st_id)           AS dat_st_id
+             , MAX(road_nm_addr)        AS road_nm_addr
+             , schl_nm                  AS name
+             , MAX(ptcn_zone_rng)       AS area
+             , MAX(ptcn_zone_rng_info)  AS location
+             , '어린이 보호구역'            AS safetyZoneType
+        FROM datamart.ptcn_zone_bk
+        WHERE 1 = 1
+        <if test="isNotNull(safetyAreaName)" >
+          AND schl_nm like '%${safetyAreaName}%'
+        </if>
+        GROUP BY schl_nm
+    </select>
+
+    <select id="safetyPwdbsAreaInformation" parameterType="tvCommonSearchCondition" resultType="egovMap">
+        SELECT MAX(id)                             AS id
+             , MAX(dat_st_id)                      AS dat_st_id
+             , MAX(fclt_lctn)                      AS road_nm_addr
+             , fclt_nm                             AS name
+             , MAX(replace(fclt_lat_lot, ' ', '')) AS location
+             , '장애인 보호구역'                       AS safetyZoneType
+        FROM datamart.pwdbs_ptcn_fclt
+        WHERE 1 = 1
+        <if test="isNotNull(safetyAreaName)" >
+            AND fclt_nm like '%${safetyAreaName}%'
+        </if>
+        GROUP BY fclt_nm
+    </select>
+
+    <select id="safetyEldAreaInformation" parameterType="tvCommonSearchCondition" resultType="egovMap">
+        SELECT MAX(id)                             AS id
+             , MAX(dat_st_id)                      AS dat_st_id
+             , MAX(fclt_lctn)                      AS road_nm_addr
+             , fclt_nm                             AS name
+             , MAX(replace(fclt_lat_lot, ' ', '')) AS location
+             , '노인 보호구역'                         AS safetyZoneType
+        FROM datamart.eld_ptcn_fclt
+        WHERE 1 = 1
+        <if test="isNotNull(safetyAreaName)" >
+            AND fclt_nm like '%${safetyAreaName}%'
+        </if>
+        GROUP BY fclt_nm
+    </select>
+
+    <!-- 반경내 CCTV 개수 -->
+    <select id="selectAreaCctvCount" resultType="java.lang.Integer" parameterType="tvCommonSearchCondition">
+        SELECT COUNT(*) FROM (
+            SELECT id                                                                 AS id
+                 , latitude                                                           AS areaLatitude
+                 , longitude                                                          AS areaLongitude
+                 , (6371 * 2 * ASIN(
+                                SQRT(
+                                    SIN(RADIANS(#{longitude}::DOUBLE PRECISION - longitude) / 2) * SIN(RADIANS(#{longitude}::DOUBLE PRECISION - longitude) / 2) +
+                                    COS(RADIANS(longitude)) * COS(RADIANS(#{longitude}::DOUBLE PRECISION)) *
+                                    SIN(RADIANS(#{latitude}::DOUBLE PRECISION - latitude) / 2) * SIN(RADIANS(#{latitude}::DOUBLE PRECISION - latitude) / 2))
+                                ))                                                     AS distance
+            FROM (
+                SELECT id
+                     , cctv_rng_info
+                     , substr(cctv_rng_info, position(' ' IN cctv_rng_info) + 1)::DOUBLE PRECISION longitude
+                     , substr(cctv_rng_info, 0, position(' ' IN cctv_rng_info))::DOUBLE PRECISION  latitude
+                FROM (
+                            SELECT  MAX(id)              as id
+                                     , replace(cctv_rng_info, ',' ,' ') as cctv_rng_info
+                            FROM datamart.cctv
+                            GROUP BY replace(cctv_rng_info, ',' ,' ')
+                        ) facility
+                ) cctv
+            ) a
+        WHERE distance <![CDATA[ < ]]> #{distance}::DOUBLE PRECISION
+    </select>
+    <!-- 반경내 어린이 승/하차구역 개수 -->
+    <select id="selectAreaChildPickupZoneCount" resultType="java.lang.Integer" parameterType="tvCommonSearchCondition">
+        SELECT COUNT(*) FROM (
+            SELECT id                                                                          AS id
+                 , latitude                                                                    AS areaLatitude
+                 , longitude                                                                   AS areaLongitude
+                 , (6371 * 2 * ASIN(
+                                SQRT(
+                                    SIN(RADIANS(#{longitude}::DOUBLE PRECISION - longitude) / 2) * SIN(RADIANS(#{longitude}::DOUBLE PRECISION - longitude) / 2) +
+                                    COS(RADIANS(longitude)) * COS(RADIANS(#{longitude}::DOUBLE PRECISION)) *
+                                    SIN(RADIANS(#{latitude}::DOUBLE PRECISION - latitude) / 2) * SIN(RADIANS(#{latitude}::DOUBLE PRECISION - latitude) / 2))
+                                ))  AS distance
+            FROM (
+                SELECT id
+                     , bgng_rng
+                     , end_rng
+                     , (substr(bgng_rng, 0, position(',' IN bgng_rng))::DOUBLE PRECISION
+                       + substr(end_rng, position(',' IN end_rng) + 1)::DOUBLE PRECISION  )/2 longitude
+                     , (substr(bgng_rng, position(',' IN bgng_rng) + 1)::DOUBLE PRECISION
+                       + substr(end_rng, 0, position(',' IN end_rng))::DOUBLE PRECISION )/2 latitude
+                FROM  (
+                    SELECT Max(id)            id
+                         , MAX(bgng_rng)      bgng_rng
+                         , MAX(end_rng)       end_rng
+                         , onaoff_zone_rng
+                    FROM datamart.cld_onaoff_zone
+                    GROUP BY onaoff_zone_rng
+                   ) facility
+            ) cld_onaoff_zone
+        ) a
+        WHERE distance <![CDATA[ < ]]> #{distance}::DOUBLE PRECISION
+    </select>
+    <!-- 반경내 어린이 통학로 개수 -->
+    <select id="selectAreaChildWaySchoolCount" resultType="java.lang.Integer" parameterType="tvCommonSearchCondition">
+        SELECT COUNT(*) FROM (
+            SELECT id                                                                 AS id
+                 , latitude                                                           AS areaLatitude
+                 , longitude                                                          AS areaLongitude
+                 , (6371 * 2 * ASIN(
+                                SQRT(
+                                    SIN(RADIANS(#{longitude}::DOUBLE PRECISION - longitude) / 2) * SIN(RADIANS(#{longitude}::DOUBLE PRECISION - longitude) / 2) +
+                                    COS(RADIANS(longitude)) * COS(RADIANS(#{longitude}::DOUBLE PRECISION)) *
+                                    SIN(RADIANS(#{latitude}::DOUBLE PRECISION - latitude) / 2) * SIN(RADIANS(#{latitude}::DOUBLE PRECISION - latitude) / 2))
+                                ))  AS distance
+            FROM (
+                 SELECT id
+                     , bgng_rng
+                     , end_rng
+                     , (substr(bgng_rng, position(',' IN bgng_rng) + 1)::DOUBLE PRECISION
+                       + substr(end_rng, position(',' IN end_rng) + 1)::DOUBLE PRECISION  )/2 longitude
+                     , (substr(bgng_rng, 0, position(',' IN bgng_rng))::DOUBLE PRECISION
+                       + substr(end_rng, 0, position(',' IN end_rng))::DOUBLE PRECISION )/2 latitude
+                FROM  (
+                    SELECT Max(id)            id
+                         , MAX(bgng_rng) bgng_rng
+                         , MAX(end_rng)   end_rng
+                         , fpath_rng
+                    FROM datamart.cld_fpath
+                    GROUP BY fpath_rng
+                  ) facility
+            ) cld_fpath
+        ) a
+        WHERE distance <![CDATA[ < ]]> #{distance}::DOUBLE PRECISION
+    </select>
+    <!-- 반경내 보호구역내 횡단보도 개수 -->
+    <select id="selectAreaCrossWalkCount" resultType="java.lang.Integer" parameterType="tvCommonSearchCondition">
+        SELECT COUNT(*) FROM (
+            SELECT id                                                            AS id
+            , latitude                                                           AS areaLatitude
+            , longitude                                                          AS areaLongitude
+            , (6371 * 2 * ASIN(
+                                SQRT(
+                                    SIN(RADIANS(#{longitude}::DOUBLE PRECISION - longitude) / 2) * SIN(RADIANS(#{longitude}::DOUBLE PRECISION - longitude) / 2) +
+                                    COS(RADIANS(longitude)) * COS(RADIANS(#{longitude}::DOUBLE PRECISION)) *
+                                    SIN(RADIANS(#{latitude}::DOUBLE PRECISION - latitude) / 2) * SIN(RADIANS(#{latitude}::DOUBLE PRECISION - latitude) / 2))
+                                ))         AS distance
+            FROM (
+                SELECT id
+                     , pedcrss_rng_info
+                     , substr(pedcrss_rng_info, position(',' IN pedcrss_rng_info) + 1)::DOUBLE PRECISION longitude
+                     , substr(pedcrss_rng_info, 0, position(',' IN pedcrss_rng_info))::DOUBLE PRECISION  latitude
+                FROM (
+                    SELECT MAX(id)             as id
+                         , pedcrss_rng_info
+                    FROM datamart.pedcrss
+                    GROUP BY pedcrss_rng_info
+                ) facility
+            ) pedcrss
+        ) a
+          WHERE distance <![CDATA[ < ]]> #{distance}::DOUBLE PRECISION
+    </select>
+    <!-- 반경내 보호구역내 교차로 개수 -->
+    <select id="selectAreaCrossRoadCount" resultType="java.lang.Integer" parameterType="tvCommonSearchCondition">
+        SELECT COUNT(*) FROM (
+            SELECT id                                                                           AS id
+                 , latitude                                                                     AS areaLatitude
+                 , longitude                                                                    AS areaLongitude
+                 , (6371 * 2 * ASIN(
+                                SQRT(
+                                    SIN(RADIANS(#{longitude}::DOUBLE PRECISION - longitude) / 2) * SIN(RADIANS(#{longitude}::DOUBLE PRECISION - longitude) / 2) +
+                                    COS(RADIANS(longitude)) * COS(RADIANS(#{longitude}::DOUBLE PRECISION)) *
+                                    SIN(RADIANS(#{latitude}::DOUBLE PRECISION - latitude) / 2) * SIN(RADIANS(#{latitude}::DOUBLE PRECISION - latitude) / 2))
+                                ))      AS distance
+            FROM (
+                SELECT id
+                     , crsrd_rng_info
+                     , substr(crsrd_rng_info, position(',' IN crsrd_rng_info) + 1)::DOUBLE PRECISION longitude
+                     , substr(crsrd_rng_info, 0, position(',' IN crsrd_rng_info))::DOUBLE PRECISION  latitude
+                  FROM  (
+                    SELECT Max(id)             id
+                         , MAX(crsrd_rng_info) crsrd_rng_info
+                         , crsrd_rng
+                    FROM datamart.crsrd
+                    GROUP BY crsrd_rng
+                  ) facility
+                ) crsrd
+            ) a
+        WHERE distance <![CDATA[ < ]]> #{distance}::DOUBLE PRECISION
+    </select>
+    <!-- 반경내 보호구역내 일방통행도로 개수 -->
+    <select id="selectAreaOneWayRoadCount" resultType="java.lang.Integer" parameterType="tvCommonSearchCondition">
+        SELECT COUNT(*) FROM (
+            SELECT id                                                                          AS id
+                 , latitude                                                                    AS areaLatitude
+                 , longitude                                                                   AS areaLongitude
+                 , (6371 * 2 * ASIN(
+                                SQRT(
+                                    SIN(RADIANS(#{longitude}::DOUBLE PRECISION - longitude) / 2) * SIN(RADIANS(#{longitude}::DOUBLE PRECISION - longitude) / 2) +
+                                    COS(RADIANS(longitude)) * COS(RADIANS(#{longitude}::DOUBLE PRECISION)) *
+                                    SIN(RADIANS(#{latitude}::DOUBLE PRECISION - latitude) / 2) * SIN(RADIANS(#{latitude}::DOUBLE PRECISION - latitude) / 2))
+                                ))  AS distance
+            FROM (
+                SELECT id
+                     , bgng_brnch
+                     , end_brnch
+                     , (substr(bgng_brnch, position(',' IN bgng_brnch) + 1)::DOUBLE PRECISION
+                       + substr(end_brnch, position(',' IN end_brnch) + 1)::DOUBLE PRECISION  )/2 longitude
+                     , (substr(bgng_brnch, 0, position(',' IN bgng_brnch))::DOUBLE PRECISION
+                       + substr(end_brnch, 0, position(',' IN end_brnch))::DOUBLE PRECISION )/2 latitude
+                FROM  (
+                    SELECT Max(id)            id
+                         , MAX(bgng_brnch)    bgng_brnch
+                         , MAX(end_brnch)     end_brnch
+                         , onwy_pang_road_rng
+                    FROM datamart.onwy_pang_road
+                    GROUP BY onwy_pang_road_rng
+                ) facility
+            ) onwy_pang_road
+        ) a
+        WHERE distance <![CDATA[ < ]]> #{distance}::DOUBLE PRECISION
+    </select>
+    <!-- 반경내 보호구역내 과속방지턱 개수 -->
+    <select id="selectAreaSpeedBumpCount" resultType="java.lang.Integer" parameterType="tvCommonSearchCondition">
+        SELECT COUNT(*) FROM (
+            SELECT id                                                                 AS id
+                 , latitude                                                           AS areaLatitude
+                 , longitude                                                          AS areaLongitude
+                 , (6371 * 2 * ASIN(
+                                SQRT(
+                                    SIN(RADIANS(#{longitude}::DOUBLE PRECISION - longitude) / 2) * SIN(RADIANS(#{longitude}::DOUBLE PRECISION - longitude) / 2) +
+                                    COS(RADIANS(longitude)) * COS(RADIANS(#{longitude}::DOUBLE PRECISION)) *
+                                    SIN(RADIANS(#{latitude}::DOUBLE PRECISION - latitude) / 2) * SIN(RADIANS(#{latitude}::DOUBLE PRECISION - latitude) / 2))
+                                ))     AS distance
+            FROM (
+                SELECT id
+                     , spbm_rng_info
+                     , substr(spbm_rng_info, position(',' IN spbm_rng_info) + 1)::DOUBLE PRECISION longitude
+                     , substr(spbm_rng_info, 0, position(',' IN spbm_rng_info))::DOUBLE PRECISION  latitude
+                FROM  (
+                    SELECT Max(id)            id
+                        , spbm_rng_info
+                    FROM datamart.ovrs_spbm
+                    GROUP BY spbm_rng_info
+                    ) facility
+                ) ovrs_spbm
+            ) a
+        WHERE distance  <![CDATA[ < ]]> #{distance}::DOUBLE PRECISION
+    </select>
+    <!-- 반경내 보호구역내 펜스 개수 -->
+    <select id="selectAreaFenceCount" resultType="java.lang.Integer" parameterType="tvCommonSearchCondition">
+        SELECT COUNT(*) FROM (
+            SELECT id                                                                 AS id
+                 , latitude                                                           AS areaLatitude
+                 , longitude                                                          AS areaLongitude
+                 , (6371 * 2 * ASIN(
+                                SQRT(
+                                    SIN(RADIANS(#{longitude}::DOUBLE PRECISION - longitude) / 2) * SIN(RADIANS(#{longitude}::DOUBLE PRECISION - longitude) / 2) +
+                                    COS(RADIANS(longitude)) * COS(RADIANS(#{longitude}::DOUBLE PRECISION)) *
+                                    SIN(RADIANS(#{latitude}::DOUBLE PRECISION - latitude) / 2) * SIN(RADIANS(#{latitude}::DOUBLE PRECISION - latitude) / 2))
+                                ))     AS distance
+            FROM (
+                SELECT id
+                     , startlocation
+                     , endlocation
+                     , (substr(startlocation, position(',' IN startlocation) + 1)::DOUBLE PRECISION
+                       + substr(endlocation, position(',' IN endlocation) + 1)::DOUBLE PRECISION  )/2 longitude
+                     , (substr(startlocation, 0, position(',' IN startlocation))::DOUBLE PRECISION
+                       + substr(endlocation, 0, position(',' IN endlocation))::DOUBLE PRECISION )/2 latitude
+                FROM  (
+                    SELECT Max(id)            id
+                         , MAX(startlocation) startlocation
+                         , MAX(endlocation)   endlocation
+                         , area5186
+                    FROM datamart.prt_fece
+                    GROUP BY area5186
+                ) facility
+            ) prt_fece
+        ) a
+        WHERE distance  <![CDATA[ < ]]> #{distance}::DOUBLE PRECISION
+    </select>
+    <select id="getCellId" parameterType="tvCommonSearchCondition" resultType="String">
+
+        select T.cellId as cellId
+        from (
+                 select A.data_j50cd cellId
+
+                      , ST_DISTANCE(concat('SRID=5179;', 'POINT', '(', A.data_xcoord, ' ', A.data_ycoord, ')')::geometry,
+                                    ST_TRANSFORM(concat('SRID=4326;', 'POINT(${selectedCoordinates})')::geometry, 5179)) AS distance
+                 FROM datamart.ptcn_zone_grid_dat A
+             ) T
+        where T.distance <![CDATA[ <= ]]> 300
+    </select>
+
+    <select id="getCellLocationInformation" resultType="weatherSummaryModel">
+        SELECT data_j50cd cellId
+             , replace(replace(st_astext(ST_TRANSFORM(concat('SRID=5179;', 'POINT', '(', data_xcoord, ' ', data_ycoord, ')'), 4326)), 'POINT(', ''),')','') cellLocation
+        FROM datamart.ptcn_zone_grid_dat
+    </select>
+
+    <select id="getBarChartDataByCarType" parameterType="speedDecisionMaking" resultType="speedDecisionMaking">
+
+        SELECT
+        <choose>
+            <when test='period == "day"'>
+                CONCAT(DATE_PART('day', T2.TRAFFICTIME), '일') AS trafficTime
+            </when>
+            <when test='period == "month"'>
+                CONCAT(DATE_PART('month', T2.TRAFFICTIME), '월') AS trafficTime
+            </when>
+            <when test='period == "year"'>
+                CONCAT(DATE_PART('year', T2.TRAFFICTIME), '년') AS trafficTime
+            </when>
+            <otherwise>
+                CONCAT(DATE_PART('day', T2.TRAFFICTIME), '일') AS trafficTime
+            </otherwise>
+        </choose>
+             , COALESCE(T1.trafficCount, 0)                  AS trafficCount
+             , COALESCE(T2.type, '-')                        AS type
+        FROM (SELECT
+            <choose>
+                <when test='period == "day"'>
+                    TO_TIMESTAMP(SUBSTRING(stats_bgng_dt::VARCHAR, 1, 10), 'YYYY-MM-DD HH24:MI') AS trafficTime
+                </when>
+                <when test='period == "month"'>
+                    SUBSTRING(stats_bgng_dt::VARCHAR, 1, 7) AS trafficTime
+                </when>
+                <when test='period == "year"'>
+                    SUBSTRING(stats_bgng_dt::VARCHAR, 1, 4) AS trafficTime
+                </when>
+                <otherwise>
+                    TO_TIMESTAMP(SUBSTRING(stats_bgng_dt::VARCHAR, 1, 10), 'YYYY-MM-DD HH24:MI') AS trafficTime
+                </otherwise>
+            </choose>
+                    , COALESCE(SUM(page_vhcl_cnt), 0)                                                     AS trafficCount
+                    , CASE WHEN (carmdl_nm = '세단' OR carmdl_nm = '헤치백' OR carmdl_nm = '쿠페' OR carmdl_nm = '컨버터블' OR carmdl_nm = 'suv' OR carmdl_nm = '승용') THEN '승용'
+                           WHEN (carmdl_nm = '미니벤'  OR carmdl_nm = '벤' OR carmdl_nm = '승합') THEN '승합'
+                           WHEN (carmdl_nm = '트럭' OR carmdl_nm = '픽업' OR carmdl_nm = '화물') THEN '화물'
+                           WHEN (carmdl_nm = '캠핑카' OR carmdl_nm = '오토바이' OR carmdl_nm = '버스' OR carmdl_nm = '특수') THEN '특수'
+                       END AS type
+              FROM datamart.cara_carmdl_hr_trff
+              WHERE TO_TIMESTAMP(stats_bgng_dt, 'YYYY-MM-DD HH24:MI') <![CDATA[ >= ]]> TO_TIMESTAMP(CONCAT(#{startDate}, ' 00:00:00'), 'YYYY-MM-DD HH24:MI')
+              AND TO_TIMESTAMP(stats_bgng_dt, 'YYYY-MM-DD HH24:MI') <![CDATA[ < ]]> TO_TIMESTAMP(CONCAT(#{endDate}, ' 00:00:00'), 'YYYY-MM-DD HH24:MI')
+              AND cara_mng_no in (SELECT T.cara_mng_no as caraMngNo
+                                    FROM (
+                                        SELECT cara_mng_no
+                                        , A.cara_pstn
+                                        , ST_DistanceSphere(ST_GeomFromText(concat('POINT(', REPLACE(A.cara_pstn, ',', ' '), ')'), 4326)
+                                        , ST_GeomFromText('POINT(${selectedCoordinates})', 4326)) AS distance
+                                        FROM datamart.carn_reog_cara_sttu A) T
+                                    WHERE T.distance <![CDATA[ <= ]]> 300)
+              GROUP BY trafficTime, type
+              ORDER BY trafficTime, type
+             ) T1
+             RIGHT OUTER JOIN (select generate_series(TO_TIMESTAMP(CONCAT(#{startDate}, ' 00:00:00'), 'YYYY-MM-DD HH24:MI')
+                                                    , TO_TIMESTAMP(CONCAT(#{endDate}, ' 00:00:00'), 'YYYY-MM-DD HH24:MI')
+                                                    ,
+                                            <choose>
+                                                <when test='period == "day"'>
+                                                    '1 day'::interval)::date as trafficTime
+                                                    , A.type
+                                                    from (SELECT '승용' AS type UNION ALL SELECT '승합' UNION ALL SELECT '화물' UNION ALL SELECT '특수' ) A
+                                                    ) T2 ON T1.trafficTime = T2.trafficTime
+                                                </when>
+                                                <when test='period == "month"'>
+                                                    '1 month'::interval)::date as trafficTime
+                                                    , A.type
+                                                    from (SELECT '승용' AS type UNION ALL SELECT '승합' UNION ALL SELECT '화물' UNION ALL SELECT '특수' ) A
+                                                    ) T2 ON T1.trafficTime = SUBSTRING(T2.trafficTime::VARCHAR, 1, 7)
+                                                </when>
+                                                <when test='period == "year"'>
+                                                    '1 year'::interval)::date as trafficTime
+                                                    , A.type
+                                                    from (SELECT '승용' AS type UNION ALL SELECT '승합' UNION ALL SELECT '화물' UNION ALL SELECT '특수' ) A
+                                                    ) T2 ON T1.trafficTime = SUBSTRING(T2.trafficTime::VARCHAR, 1, 4)
+                                                </when>
+                                                <otherwise>
+                                                    '1 day'::interval)::date as trafficTime
+                                                    , A.type
+                                                    from (SELECT '승용' AS type UNION ALL SELECT '승합' UNION ALL SELECT '화물' UNION ALL SELECT '특수' ) A
+                                                    ) T2 ON T1.trafficTime = T2.trafficTime
+                                                </otherwise>
+                                            </choose>
+        AND T1.type = T2.type
+        WHERE T2.trafficTime <![CDATA[ >= ]]> TO_TIMESTAMP(CONCAT(#{startDate}, ' 00:00:00'), 'YYYY-MM-DD HH24:MI')
+        AND T2.trafficTime <![CDATA[ < ]]> TO_TIMESTAMP(CONCAT(#{endDate}, ' 00:00:00'), 'YYYY-MM-DD HH24:MI')
+        ORDER BY T2.trafficTime
+
+    </select>
+
+    <select id="getPieChartDataByCarType" parameterType="speedDecisionMaking" resultType="speedDecisionMaking">
+        SELECT COALESCE(T1.trafficCount, 0) AS trafficCount
+             , COALESCE(T2.type, '-')                        AS type
+        FROM (
+                 SELECT COALESCE(sum(page_vhcl_cnt), 0) AS trafficCount
+                      , CASE WHEN (carmdl_nm = '세단' OR carmdl_nm = '헤치백' OR carmdl_nm = '쿠페' OR carmdl_nm = '컨버터블' OR carmdl_nm = 'suv' OR carmdl_nm = '승용') THEN '승용'
+                             WHEN (carmdl_nm = '미니벤'  OR carmdl_nm = '벤' OR carmdl_nm = '승합') THEN '승합'
+                             WHEN (carmdl_nm = '트럭' OR carmdl_nm = '픽업' OR carmdl_nm = '화물') THEN '화물'
+                             WHEN (carmdl_nm = '캠핑카' OR carmdl_nm = '오토바이' OR carmdl_nm = '버스' OR carmdl_nm = '특수') THEN '특수'
+                     END AS type
+                 FROM datamart.cara_carmdl_hr_trff
+                 WHERE TO_TIMESTAMP(stats_bgng_dt, 'YYYY-MM-DD HH24:MI') <![CDATA[ >= ]]> TO_TIMESTAMP(CONCAT(#{startDate}, ' 00:00:00'), 'YYYY-MM-DD HH24:MI')
+                   AND TO_TIMESTAMP(stats_bgng_dt, 'YYYY-MM-DD HH24:MI') <![CDATA[ < ]]> TO_TIMESTAMP(CONCAT(#{endDate}, ' 00:00:00'), 'YYYY-MM-DD HH24:MI')
+                   AND cara_mng_no IN (SELECT T.cara_mng_no as caraMngNo
+                                       FROM (
+                                            SELECT cara_mng_no
+                                                 , A.cara_pstn
+                                                 , ST_DistanceSphere(ST_GeomFromText(concat('POINT(', REPLACE(A.cara_pstn, ',', ' '), ')'), 4326)
+                                                                     , ST_GeomFromText('POINT(${selectedCoordinates})', 4326)) AS distance
+                                            FROM datamart.carn_reog_cara_sttu A) T
+                                        WHERE T.distance <![CDATA[ <= ]]> 300)
+                 GROUP BY type
+                 ORDER BY type
+             ) T1
+                 RIGHT OUTER JOIN (SELECT '승용' AS type UNION ALL SELECT '승합' UNION ALL SELECT '화물' UNION ALL SELECT '특수'
+        ) T2 ON T1.type = T2.type
+
+    </select>
+
+
+    <select id="getTrafficTempWeatherData" parameterType="speedDecisionMaking" resultType="weatherModel">
+        <![CDATA[
+        SELECT string_agg(tmpQuery, ' UNION ALL ') weatherPreparedStatement
+            FROM (
+                SELECT concat('SELECT ''':: text, trafficDay, ''' meteringDate, '''::text, trafficTime, ''' meteringHour, '::text, trafficCount, ' trafficCount'::text) tmpQuery
+                     , trafficDay
+                FROM (
+                    SELECT to_char(TO_TIMESTAMP(SUBSTRING(stats_bgng_dt::VARCHAR, 1, 13), 'YYYY-MM-DD HH24:MI'), 'yyyyMMDD')             AS trafficDay
+                         , to_char(TO_TIMESTAMP(SUBSTRING(stats_bgng_dt::VARCHAR, 1, 13), 'YYYY-MM-DD HH24:MI'), 'HH24')                 AS trafficTime
+                         , COALESCE(SUM(page_vhcl_cnt), 0)                                                                               AS trafficCount
+                    FROM datamart.cara_carmdl_hr_trff
+                    WHERE TO_TIMESTAMP(stats_bgng_dt, 'YYYY-MM-DD HH24:MI') >= TO_TIMESTAMP(CONCAT(#{startDate}, ' 00:00:00'), 'YYYY-MM-DD HH24:MI')
+                    AND TO_TIMESTAMP(stats_bgng_dt, 'YYYY-MM-DD HH24:MI') < TO_TIMESTAMP(CONCAT(#{endDate}, ' 00:00:00'), 'YYYY-MM-DD HH24:MI')
+                    AND cara_mng_no in (SELECT T.cara_mng_no as caraMngNo
+                                        FROM (SELECT cara_mng_no
+                                                   , A.cara_pstn
+                                                   , ST_DistanceSphere(ST_GeomFromText(concat('POINT(', REPLACE(A.cara_pstn, ',', ' '), ')'), 4326)
+                                                                       , ST_GeomFromText('POINT(${selectedCoordinates})', 4326)) AS distance
+                                              FROM datamart.carn_reog_cara_sttu A) T
+                                        WHERE T.distance <= 300)
+                    GROUP BY trafficDay, trafficTime
+                    ORDER BY trafficDay, trafficTime
+                ) a
+            ) b
+        GROUP BY trafficDay
+        ]]>
+    </select>
+</mapper>

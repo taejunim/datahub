@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.pm.mapper.AcdntRcptInfoMapper">
+	<!-- ### 메크로 정의 -->
+	<sql id="tb"> PM_ACDNT_RCPT_INFO </sql>
+	<sql id="s"> select * </sql>
+	<sql id="sl"> select 
+		ID,
+		DAT_ST_ID,
+		OPER_CO,
+		PM_TYPE,
+		SEXD,
+		AGE,
+		ACDNT_OCRN_DT,
+		ACDNT_OCRN_PLC,
+		ACDNT_TYPE,
+		ACDNT_CN,
+		ACDNT_X,
+		ACDNT_Y,
+		ACDNT_SPOT
+	</sql>
+	<sql id="f"> from <include refid="tb"/> </sql>
+	<sql id="lw">
+		<where>
+		</where>
+	</sql>
+	<sql id="fw">
+		<where>
+			and ID = #{id}
+		</where>
+	</sql>
+	<sql id="ord">
+		<if test="empty(sort)"> order by ID </if>
+		<if test="!empty(sort)"> order by ${sort} </if>
+		<if test="!empty(sortOrd)"> ${sortOrd} </if>
+		<if test="pagingYn == true" > limit #{start}, #{length}	</if>
+	</sql>
+	<!-- ### Select -->
+	<select id="select" parameterType="acdntRcptInfo" resultType="acdntRcptInfo">
+		<include refid="s"/>
+		<include refid="f"/>
+		<include refid="fw"/>
+	</select>
+
+	<select id="selectLastId" resultType="java.lang.String">
+		select ID <include refid="f"/>
+		where  CAST(SUBSTRING_INDEX(ID, '::', -1) AS UNSIGNED) = (
+		SELECT MAX(CAST(SUBSTRING_INDEX(ID, '::', -1) AS UNSIGNED))
+		<include refid="f"/>
+		);
+	</select>
+	<select id="selectInfoLastId" resultType="java.lang.String">
+		select MAX(ID) <include refid="f"/>
+		where DAT_ST_ID = 'ACCIDENT_INFO'
+	</select>
+	<select id="selectSpotLastId" resultType="java.lang.String">
+		select MAX(ID) <include refid="f"/>
+		where DAT_ST_ID = 'ACCIDENT_SPOT'
+	</select>
+	<!-- ### selectList -->
+	<select id="selectList" parameterType="acdntRcptInfo" resultType="acdntRcptInfo">
+		<include refid="sl"/>
+		<include refid="f"/>
+		<include refid="lw"/>
+		<include refid="ord"/>
+	</select>
+	<!-- ### Count -->
+	<select id="count" parameterType="acdntRcptInfo" resultType="java.lang.Integer">
+		select COUNT(*)
+		<include refid="f"/>
+		<include refid="lw"/>
+	</select>
+	<!-- ### Insert -->
+	<insert id="insert" parameterType="acdntRcptInfo" >
+		insert into PM_ACDNT_RCPT_INFO (
+			ID,
+		    DAT_ST_ID,
+			OPER_CO,
+			PM_TYPE,
+			SEXD,
+			AGE,
+			ACDNT_OCRN_DT,
+			ACDNT_OCRN_PLC,
+			ACDNT_TYPE,
+			ACDNT_CN,
+			ACDNT_X,
+			ACDNT_Y,
+			ACDNT_SPOT
+		) values (
+			#{id},
+		    #{datStId},
+			#{operCo},
+			#{pmType},
+			#{sexd},
+			#{age},
+			#{acdntOcrnDt},
+			#{acdntOcrnPlc},
+			#{acdntType},
+			#{acdntCn},
+			#{acdntX},
+			#{acdntY},
+			#{acdntSpot}
+		)
+	</insert>
+
+	<!-- ### update -->
+	<update id="update" parameterType="acdntRcptInfo">
+		update <include refid="tb"/> set
+			OPER_CO= #{operCo}
+			<if test="isNotNull(datStId)" > , DAT_ST_ID= #{datStId} </if>
+			<if test="isNotNull(pmType)" > , PM_TYPE= #{pmType} </if>
+			<if test="isNotNull(sexd)" > , SEXD= #{sexd} </if>
+			<if test="isNotNull(age)" > , AGE= #{age} </if>
+			<if test="isNotNull(acdntOcrnDt)" > , ACDNT_OCRN_DT= #{acdntOcrnDt} </if>
+			<if test="isNotNull(acdntOcrnPlc)" > , ACDNT_OCRN_PLC= #{acdntOcrnPlc} </if>
+			<if test="isNotNull(acdntType)" > , ACDNT_TYPE= #{acdntType} </if>
+			<if test="isNotNull(acdntCn)" > , ACDNT_CN= #{acdntCn} </if>
+			<if test="isNotNull(acdntX)" > , ACDNT_X= #{acdntX} </if>
+			<if test="isNotNull(acdntY)" > , ACDNT_Y= #{acdntY} </if>
+			<if test="isNotNull(acdntSpot)" > , ACDNT_SPOT= #{acdntSpot} </if>
+			<include refid="fw"/>
+	</update>
+
+	<!-- ### delete -->
+	<update id="delete" parameterType="acdntRcptInfo" >
+		update <include refid="tb"/> set
+		<include refid="fw"/>
+	</update>
+</mapper>

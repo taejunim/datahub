@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.pm.mapper.PmSmhMapper">
+    <insert id="insertPmSmh" parameterType="java.util.List">
+        INSERT IGNORE INTO pm_smh (
+             ID
+           , LOCATION_X
+           , LOCATION_Y
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+          (
+            #{item.id}
+          , #{item.location_x}
+          , #{item.location_y}
+          )
+        </foreach>
+    </insert>
+
+    <select id="selectPmSmhList" resultType="gInfra">
+        SELECT
+            a.ID AS id
+             , a.LOCATION_X AS location_x
+             , a.LOCATION_Y AS location_y
+        FROM pm_smh AS a
+    </select>
+</mapper>

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.pm.mapper.LendRtnHstryMapper">
+	<!-- ### 메크로 정의 -->
+	<sql id="tb"> PM_LEND_RTN_HSTRY </sql>
+	<sql id="s"> select * </sql>
+	<sql id="sl"> select 
+		ID,
+		OPER,
+		PM_TYPE,
+		MBR_NO,
+		KCKBRD_ID,
+		LEND_DT,
+		SPOINT_X,
+		SPOINT_Y,
+		RENT_SPOT,
+		RTN_DT,
+		EPOINT_X,
+		EPOINT_Y,
+		RETURN_SPOT,
+		STEP,
+		ILLE_PARK
+	</sql>
+	<sql id="f"> from <include refid="tb"/> </sql>
+	<sql id="lw">
+		<where>
+			<if test="!empty(recSt)"> and REC_ST = #{recSt} </if>
+<!--			<include refid="BaseSql.BaseWhere"/>-->
+		</where>
+	</sql>
+	<sql id="fw">
+		<where>
+			and ID = #{id}
+<!-- 			<include refid="BaseSql.BaseWhere"/>-->
+		</where>
+	</sql>
+	<sql id="ord">
+		<if test="empty(sort)"> order by ID </if>
+		<if test="!empty(sort)"> order by ${sort} </if>
+		<if test="!empty(sortOrd)"> ${sortOrd} </if>
+		<if test="pagingYn == true" > limit #{start}, #{length}	</if>
+	</sql>
+	<!-- ### Select -->
+	<select id="select" parameterType="lendRtnHstry" resultType="lendRtnHstry">
+		<include refid="s"/>
+		<include refid="f"/>
+		<include refid="fw"/>
+	</select>
+
+	<select id="selectLastId" resultType="java.lang.String">
+		select MAX(ID) <include refid="f"/>
+	</select>
+
+	<!-- ### selectList -->
+	<select id="selectList" parameterType="lendRtnHstry" resultType="lendRtnHstry">
+		<include refid="sl"/>
+		<include refid="f"/>
+		<include refid="lw"/>
+		<include refid="ord"/>
+	</select>
+	<!-- ### Count -->
+	<select id="count" parameterType="lendRtnHstry" resultType="java.lang.Integer">
+		select COUNT(*)
+		<include refid="f"/>
+		<include refid="lw"/>
+	</select>
+	<!-- ### Insert -->
+	<insert id="insert" parameterType="lendRtnHstry" >
+		insert into PM_LEND_RTN_HSTRY (
+			ID,
+			OPER,
+			PM_TYPE,
+			MBR_NO,
+			KCKBRD_ID,
+			LEND_DT,
+			SPOINT_X,
+			SPOINT_Y,
+			RENT_SPOT,
+			RTN_DT,
+			EPOINT_X,
+			EPOINT_Y,
+			RETURN_SPOT,
+			STEP,
+			ILLE_PARK
+<!--			<include refid="BaseSql.InRegRecStPrm"/>-->
+		) values (
+			#{id},
+			#{oper},
+			#{pmType},
+			#{mbrNo},
+			#{kckbrdId},
+			#{lendDt},
+			#{spointX},
+			#{spointY},
+			#{rentSpot},
+			#{rtnDt},
+			#{epointX},
+			#{epointY},
+			#{returnSpot},
+			#{step},
+			#{illePark}
+<!--			<include refid="BaseSql.InRegRecStVal"/>-->
+		)
+	</insert>
+
+	<!-- ### update -->
+	<update id="update" parameterType="lendRtnHstry">
+		update <include refid="tb"/> set
+			OPER= #{oper}
+			<if test="isNotNull(pmType)" > , PM_TYPE= #{pmType} </if>
+			<if test="isNotNull(mbrNo)" > , MBR_NO= #{mbrNo} </if>
+			<if test="isNotNull(kckbrdId)" > , KCKBRD_ID= #{kckbrdId} </if>
+			<if test="isNotNull(lendDt)" > , LEND_DT= #{lendDt} </if>
+			<if test="isNotNull(spointX)" > , SPOINT_X= #{spointX} </if>
+			<if test="isNotNull(spointY)" > , SPOINT_Y= #{spointY} </if>
+			<if test="isNotNull(rentSpot)" > , RENT_SPOT= #{rentSpot} </if>
+			<if test="isNotNull(rtnDt)" > , RTN_DT= #{rtnDt} </if>
+			<if test="isNotNull(epointX)" > , EPOINT_X= #{epointX} </if>
+			<if test="isNotNull(epointY)" > , EPOINT_Y= #{epointY} </if>
+			<if test="isNotNull(returnSpot)" > , RETURN_SPOT= #{returnSpot} </if>
+			<if test="isNotNull(step)" > , STEP= #{step} </if>
+			<if test="isNotNull(illePark)" > , ILLE_PARK= #{illePark} </if>
+<!--			<include refid="BaseSql.Update" />-->
+			<include refid="fw"/>
+	</update>
+
+	<!-- ### delete -->
+	<update id="delete" parameterType="lendRtnHstry" >
+		update <include refid="tb"/> set
+		<include refid="BaseSql.Delete" />
+		<include refid="fw"/>
+	</update>
+</mapper>

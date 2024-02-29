@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.jcms.framework.menu.mapper.MenuMapper">
+
+	<sql id="tb"> JCMS_MNGR_MENU </sql>
+	<sql id="jtb"> JCMS_MNGR_MENU </sql>
+	<sql id="s">
+		SELECT MENU_ID, MENU_NM, UPPER_MENU_ID, PGM_ID, MENU_DESC, MENU_ORD, ICON, REG_ID, REG_DT, UPD_ID, UPD_DT, DEL_ID, DEL_DT
+	</sql>
+	<sql id="l">
+		SELECT MENU_ID, MENU_NM, UPPER_MENU_ID, PGM_ID, MENU_DESC, MENU_ORD, ICON, REG_ID, REG_DT, UPD_ID, UPD_DT, DEL_ID, DEL_DT
+	</sql>
+	<sql id="sf"> FROM <include refid="tb"/> </sql>
+	<sql id="lf"> FROM <include refid="jtb"/> </sql>
+	<sql id="sw">
+		WHERE DEL_DT IS NULL
+			<if test="!empty(menuId)" > AND MENU_ID = #{menuId} </if>
+	</sql>
+	<sql id="lw">
+		WHERE DEL_DT IS NULL
+			<choose>
+				<when test="empty(upperMenuId)"> AND UPPER_MENU_ID IS NULL </when>
+				<otherwise>	AND UPPER_MENU_ID = #{upperMenuId} </otherwise>
+			</choose>
+	</sql>
+	<sql id="ord">
+		<if test="!empty(sort) and !empty(sortOrd)"> ORDER BY ${sort} ${sortOrd} </if>
+		<if test="pagingYn == true"> limit #{start}, #{length} </if>
+	</sql>
+
+
+	<select id="select" parameterType="menuSearch" resultType="menu">
+		<include refid="s"/>
+		<include refid="sf"/>
+		<include refid="sw"/>
+	</select>
+	
+	<select id="selectList" parameterType="menuSearch" resultType="menu">
+		<include refid="l"/>
+		<include refid="lf"/>
+		<include refid="lw"/>
+		<include refid="ord"/>
+	</select>
+	
+	<select id="selectRoleMenuList" parameterType="menuSearch" resultType="menu">
+		SELECT B.MENU_ID, B.MENU_NM, B.UPPER_MENU_ID, B.MENU_DESC, B.MENU_ORD, B.ICON, B.PGM_ID,
+		       B.REG_ID, B.REG_DT, B.UPD_ID, B.UPD_DT, B.DEL_ID, B.DEL_DT, A.ROLE_AUTH
+		FROM JCMS_MNGR_MENU_ROLE A, JCMS_MNGR_MENU B
+		WHERE A.ROLE_AUTH IN (<foreach collection="roleAuth" item="item" separator="," >#{item}</foreach>)
+			AND A.MENU_ID = B.MENU_ID
+			AND B.DEL_DT IS NULL
+			<choose>
+				<when test="empty(upperMenuId)"> AND B.UPPER_MENU_ID IS NULL </when>
+				<otherwise> AND B.UPPER_MENU_ID = #{upperMenuId} </otherwise>
+			</choose>
+		<if test="!empty(sort) and !empty(sortOrd)" > ORDER BY ${sort} ${sortOrd} </if>
+	</select>
+	
+	<select id="count" parameterType="menuSearch" resultType="java.lang.Integer">
+		SELECT COUNT(MENU_ID)
+		<include refid="lf"/>
+		<include refid="lw"/>
+	</select>
+
+	<insert id="insert" parameterType="menu">
+		INSERT INTO <include refid="tb"/> (
+			MENU_NM, UPPER_MENU_ID, PGM_ID, MENU_DESC, MENU_ORD, ICON, REG_ID, REG_DT
+		) VALUES (
+			#{menuNm}, #{upperMenuId}, #{pgmId}, #{menuDesc}, #{menuOrd}, #{icon}, #{regId}, SYSDATE()
+		)
+	</insert>
+
+	<update id="update" parameterType="menu">
+		UPDATE <include refid="tb"/>
+		SET <include refid="BaseSql.Update"/>
+		    , MENU_NM = #{menuNm}
+			, PGM_ID = #{pgmId}
+			, MENU_DESC = #{menuDesc,jdbcType=VARCHAR}
+			, ICON = #{icon}
+		WHERE MENU_ID = #{menuId}
+	</update>
+	
+	<update id="updateOrder" parameterType="menu">
+		UPDATE <include refid="tb"/>
+		SET UPPER_MENU_ID = #{upperMenuId,jdbcType=NUMERIC}
+			, MENU_ORD = #{menuOrd}
+		WHERE MENU_ID = #{menuId}
+	</update>
+
+	<update id="delete" parameterType="menu">
+		UPDATE <include refid="tb"/>
+		SET <include refid="BaseSql.Delete"/>
+		WHERE MENU_ID = #{menuId}
+	</update>
+	
+	<select id="selectMaxMenuOrder" parameterType="menuSearch" resultType="java.lang.Integer" >
+  		SELECT IFNULL(MAX(MENU_ORD),0)+1
+		<include refid="lf"/>
+		<include refid="lw"/>
+  	</select>
+
+</mapper>

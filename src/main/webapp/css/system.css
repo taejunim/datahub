@@ -1,0 +1,136 @@
+@charset "utf-8"; .loginWrap { width:30%; width: 440px; position: relative; top: 50%; left: 50%; transform: translate(-50%, -50%); } 
+.loginWrap .formTit { font-size: 30px; display: block; font-weight: 600; text-align: center; margin-bottom: 60px; color: #3a3a3a; } 
+.loginWrap .loginForm .loginFormItem { margin-bottom: 30px; } 
+.loginWrap .loginForm .loginFormItem input::placeholder { font-size:14px; font-weight:500; color:#a3a0a0 } 
+.loginWrap .loginForm .loginFormItem input[type="text"] { width: 100%; height: 52px; border: 1px solid #dddddd; border-radius: 5px; } 
+.loginWrap .loginForm .loginFormItem input[type="password"] { width: 100%; height: 52px; border-radius: 5px; border: 1px solid #dddddd; } 
+.loginWrap .loginForm .loginFormItem.id label span {} 
+.loginWrap .loginForm .loginFormItem.pw label span {} 
+.loginWrap .loginForm .loginFormItem.gender label span {} 
+
+.loginWrap .loginForm .loginFormItem label { display:block; margin-bottom: 16px; } 
+.loginWrap .loginForm .loginFormItem label span {font-size: 17px;font-weight: 500;} 
+
+.loginWrap .loginBtn {width: 100%;height: 50px;background: linear-gradient(45deg, #1c8ae8, #075bb6);border-radius: 5px;font-size: 15px;color: #fff;} 
+.loginOption { margin: 17px 0; } 
+.loginOption .join { color: inherit; font-weight: 300; font-size: 16px; float: left; } 
+.loginOption .findBtn { float: right; } 
+.loginOption .findBtn a { font-weight: 500; text-decoration: auto; font-size: 16px; color: inherit; position: relative; padding-left: 10px; } 
+.loginOption .findBtn a:after { position:absolute; content:""; width:1px; height: 13px; background: #848484; top: 6px; left: 3px; } 
+.loginOption .findBtn a:first-child:after { width:0; } 
+/*회원가입*/ 
+.join-wrap { width:100%; text-align: left; } 
+
+.joinProcess { width:100%; margin-bottom: 20px; } 
+.joinProcess ul li { width: 23.5%; margin-right: 1.8%; float:left; background: #e9e9e9; position: relative; } 
+.joinProcess ul li:after {position:absolute;content:"";top: 10px;right: -12px;width: 0px;height: 0px;border-top: 20px solid transparent;border-left: 20px solid #e9e9e9;border-bottom: 20px solid transparent;} 
+.joinProcess ul li:last-child:after { border:0; } 
+.joinProcess ul li > div { height:60px; text-align: center; font-size: 0; padding-top: 7px; } 
+.joinProcess ul li i {height: 45px;display: inline-block;vertical-align: middle;border-radius: 50px;} 
+.joinProcess ul li i + p {display: inline-block;vertical-align: middle;font-size: 17px;text-transform: capitalize;} 
+.joinProcess ul li:last-child { margin-right:0; } 
+
+.joinProcess ul li.on { background: #065bb4; } 
+.joinProcess ul li.on p { color:#fff; } 
+.joinProcess ul li.on:nth-child(1):after {border-left: 20px solid #065bb4;} 
+.joinProcess ul li.on:nth-child(2):after {border-left: 20px solid #065bb4;} 
+.joinProcess ul li.on:nth-child(3):After {border-left: 20px solid #065bb4;} 
+.termsPoint { color: #134dd7; font-weight: 500; } 
+
+.join-wrap .subBody-tit2 { font-size: 17px; font-weight: 500; border: 1px solid #dedede; padding: 15px 0; padding-left: 20px; background: #f3f3f3; } 
+
+.agreeBox { margin-bottom: 11px; } 
+.agreeBox input[type="checkbox"] { width: 14px; height: 14px; margin-top: 2px; margin-right: 3px; } 
+.agreeBox input[type="checkbox"] + span { font-size: 16px; } 
+
+/*이용약관*/
+.terms-form { border:1px solid #dedede; padding:40px; height: 330px; overflow-y:auto; margin-bottom: 20px; margin-top: -1px; } 
+.terms-formTxt strong { font-size: 19px; font-weight: 600; margin-bottom: 20px; display: block; } 
+.terms-formTxt ol li { margin:10px 0; } 
+.terms-formTxt ol li span { font-size: 17px; font-weight: 500; margin-bottom: 5px; display: block; } 
+.terms-formTxt ol li p { margin-bottom: 20px; font-size: 16px; font-weight: 300; line-height: 1.6; } 
+.terms-formTxt ol li p b { font-weight:500; display: block; margin: 6px 0; } 
+.terms-formTxt ol li table { margin-bottom:40px; } 
+
+.terms-infoTxt { font-size: 16px; font-weight: 300; line-height: 1.5; } 
+
+.agreeBox label { display: inline-block; vertical-align: middle; } 
+.agreeBox .terms-infoTxt { display: inline-block; vertical-align: middle; } 
+
+.allAgreeBox { background: #f6f6f6; padding: 23px 20px; text-align: center; } 
+
+/*정보입력*/
+.joinForm-hd .subBody-tit2 { float:left; } 
+.joinForm-hd .joinForm-caution { float:right; font-size: 16px; margin-top: 8px; } 
+.joinInfo-form table th { padding: 21px; } 
+.joinInfo-form table td { padding: 18px; } 
+
+.joinInfo-form .join-writeForm { height: 37px; width: 280px; } 
+.form-subTxt { font-weight: 300; } 
+
+/*회원가입완료*/
+.join-success { width:100%; height:400px; background: #f8f8f8; padding-top: 60px; margin-bottom: 80px; } 
+.join-success img { display: block; margin:0 auto; margin-bottom: 30px; } 
+.join-success strong { display: block; text-align: center; font-size: 25px; margin-bottom: 10px; color: #7630ac; } 
+.join-success p { text-align: center; font-weight: 300; line-height: 1.4; font-size: 17px; } 
+
+.btn-wrap.joinFinal button { height: 45px; width: 210px; } 
+.btn-wrap.joinFinal button.home { border: 1px solid #33356e; color: #33356e; } 
+.btn-wrap.joinFinal button.login { background: #33356e; color: #fff; border: 1px solid #33356e; } 
+
+.phoneCrtfcCheck-area { border: 1px solid #dfdfdf; min-height: 520px; padding: 110px; } 
+.phoneCrtfcCheck-area h4 { font-size: 27px; text-align: center; margin-bottom: 19px; } 
+.phoneCrtfcCheck-area p { text-align: center; font-weight: 300; font-size: 17px; } 
+.phoneCrtfcCheck-area .phoneCrtfcCheck-box { margin:20px auto; display:block; margin-top:50px; width: 650px; text-align: center; } 
+.phoneCrtfcCheck-area .phoneCrtfcCheck-box img { margin: 0 auto; display: block; margin-bottom: 40px; } 
+.phoneCrtfcCheck-area .phoneCrtfcCheck-box button.checkBtn {width: 400px;height: 45px;color: #fff;background: linear-gradient(45deg, #1d8be9, #055ab5);border-radius: 5px;margin-bottom: 50px;} 
+
+.joinBox { min-height: 520px; padding: 110px; padding-right: 345px;}
+.joinBox h4 { font-size: 27px; text-align: center; margin-bottom: 19px; } 
+
+.joinBox .joinBox-tit { font-size: 18px; font-weight: 500; border-bottom: 1px solid #767676; display: block; padding-bottom: 10px; margin-bottom: 10px; } 
+.joinBox .formRow { position:relative; width:100%; min-height: 50px; clear: left; border: 1px solid #e5e5e5; border-left: 0; border-right: 0; margin-top: -1px; } 
+.joinBox .formRow .formTxt { float: left; border-right: 1px solid #e5e5e5; } 
+.joinBox .formRow .formTxt label { min-width: 150px; display: block; line-height: 60px; font-size: 15px; font-weight: 500; background: #f7f7f7; padding-left: 13px; } 
+.joinBox .formRow .formBox { float: left; width: calc(100% - 152px); margin-left: -1px; height: 100%; padding-top: 12px; padding-left: 10px; } 
+.joinBox .formRow .formBox input::placeholder { font-weight:300; } 
+.joinBox .formRow .formBox input[type="text"] { border: 1px solid #e1e1e1; width: 210px; } 
+.joinBox .formRow .formBox input[type="password"] { border: 1px solid #e1e1e1; width: 460px; } 
+.joinBox .formRow .formBox input[type="text"] + button { height: 35px; background: #404040; color: #fff; min-width: 80px; } 
+
+.joinBox .formRow .formBox > div { width: 100%; } 
+.joinBox .formRow .formBox .birth input[type="text"] { width: 80px; } 
+.joinBox .formRow .formBox .birth input[type="text"] + b { font-weight:400; margin-left:5px; margin-right:10px; } 
+.joinBox .formRow.adress .formBox .adressDtl input[type="text"] { width: 457px; } 
+.joinBox .formRow.adress .formBox .adressDtl input[type="text"] + b { font-weight: 300; } 
+.joinBox .formRow.adress .formBox .adressDtl { margin-top: 7px; } 
+.joinBox .formRow.adress .formTxt label { line-height: 100px; } 
+
+.joinBox .formRow.mobile .formBox input[type="text"] { width: 85px; } 
+.joinBox .formRow.mobile .formBox input[type="text"] + b { font-weight:300; margin:0 3px; } 
+.point { color:red; margin: 3px } 
+
+.joinForm .cmnBtn { min-width: 180px; } 
+
+.loginWrap.find .loginForm { border: 1px solid #cfcfcf; padding: 30px 20px; } 
+.loginWrap.find .loginForm img { width: 190px; margin:0 auto; display:block; margin-bottom: 30px; } 
+.loginWrap.find .loginForm strong { font-size: 24px; text-align: center; display: block; margin-bottom: 10px; } 
+.loginWrap.find .loginForm p { text-align: center; font-weight: 300; font-size: 16px; margin-bottom: 30px; } 
+
+.layerPop.find { width: 441px; } 
+.layerPop.find .layerPop-header { min-height: 50px; line-height: 50px; } 
+.layerPop.find .layerPop-header strong { font-size: 19px; } 
+.layerPop.find .layerPop-header .layerPop-close { width: 23px; height: 23px; right: 16px; } 
+
+.layerPop.find .layerPop-con { height: auto; } 
+.layerPop.find .layerPop-con span{font-size: 12px;padding-left: 5px;} 
+.layerPop.find .layerPop-con p b {font-weight:500;margin: 0 6px;} 
+.layerPop.find .layerPop-con p { text-align: center; font-weight: 300; } 
+
+.layerPop.find .loginForm { border: 1px solid #cfcfcf; padding: 30px 20px; } 
+.layerPop.find .loginForm img { width: 190px; margin:0 auto; display:block; margin-bottom: 30px; } 
+.layerPop.find .loginForm strong { font-size: 24px; text-align: center; display: block; margin-bottom: 10px; } 
+.layerPop.find .loginForm p { text-align: center; font-weight: 300; font-size: 16px; margin-bottom: 30px; } 
+
+.layerPop.find .loginBtn {width: 100%;height: 50px;background: linear-gradient(45deg, #1d8be9, #055ab5);border-radius: 5px;font-size: 15px;color: #fff;} 
+

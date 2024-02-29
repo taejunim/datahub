@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="BaseSql">
+
+	<sql id="BaseWhere">
+		<!-- REC_ST 상태값  Y:정상, R:임시, D:삭제 -->
+		<if test="empty(recSt)"> </if>
+		<if test="!empty(recSt)">
+		</if>
+	</sql>
+
+	<sql id="InRecStPrm"> </sql>
+	<sql id="InRecStVal">
+	</sql>
+
+	<sql id="InRegPrm"> </sql>
+	<sql id="InRegVal"> </sql>
+
+	<sql id="InRegRecStPrm">  <include refid="BaseSql.InRecStPrm"/> </sql>
+	<sql id="InRegRecStVal"> <include refid="BaseSql.InRecStVal"/> </sql>
+
+	<sql id="Update">
+	</sql>
+
+	<sql id="Delete">
+	</sql>
+</mapper>
+ 

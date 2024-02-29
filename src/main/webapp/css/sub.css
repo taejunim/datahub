@@ -1,0 +1,80 @@
+@charset "utf-8";
+.contents.full .contentsBody { padding-left:30px; height: 100%; } 
+.contents.full.login .contentsBody {height: 100vh;background: url("../images/system/bg.png") no-repeat right -191px bottom -70px;} 
+.contents.full.login .contentsBody .contentsBody-inner { height:100%; } 
+.contentsHd {border-bottom: 1px solid #cdcdcd;margin-bottom: 35px;} 
+.contentsHd .contentsTit {font-size: 23px;font-weight: 600;float: left;padding-bottom: 20px;background: url(../images/cmn/tit.png) no-repeat top 2px left 0;background-size: 18px;padding-left: 25px;} 
+.contentsHd .location { float: right; } 
+.contentsHd .location ul li { float: left; position: relative; } 
+.contentsHd .location ul li a {padding: 0px 15px;color: #616161;} 
+.contentsHd .location ul li.home {background: url("../images/sub/ico_location_home.png")  no-repeat top 0px left 0px;}
+.contentsHd .location ul li.home a { font-size: 0px; } 
+.contentsHd .location ul li::after {position: absolute;content: "";width: 10px;height: 10px;background: url("../images/sub/ico_location_arrow.png") center center no-repeat;top: 2px;left: -2px;} 
+.contentsHd .location ul li:first-child::after {width: 0px;} 
+.contentsHd .location ul li:last-child a {color: rgb(28 138 232);font-weight: 500;} 
+
+.txt { font-weight: 300; line-height: 1.9; word-break: break-all; font-size: 15px; } 
+.printingBtn {padding: 5px 14px;height: 35px;color: #3a3a3a;display: inline-block;vertical-align: middle;font-size: 14px;border: 1px solid #b5b5b5;border-radius: 5px;} 
+
+.pop-conTit { font-size: 17px; font-weight: 500; margin: 11px 0; } 
+.option { border-bottom: 1px dotted #b5b5b5; padding-bottom: 10px; margin-bottom: 10px; } 
+.option .pop-conTit { float:left; } 
+.option .pop-conTit + .userId { float: right; margin-top: 7px; } 
+.option .pop-conTit + .userId label { font-weight: 500; margin-right: 10px; } 
+.option .pop-conTit + .userId input[type="text"] { border-radius: 5px; height: 31px; } 
+
+.ycWater-infoImg { margin-top: 30px; margin-bottom: 30px; } 
+.ycWater-infoImg ul li { width: 59%; height: 430px; float: left; margin-right: 1%; } 
+.ycWater-infoImg ul li img { width: 100%; height: 100%; } 
+.ycWater-infoImg ul li:last-child { width: 40%; margin-right: 0px; } 
+
+.contentsReserch { border: 1px solid rgb(217, 217, 217); padding: 20px; } 
+.contentsReserch .reserchHd strong { display: block; font-size: 17px; font-weight: 500; background: url("../images/sub/ico_reserch_tit.png") left center no-repeat; padding: 7px 0px 7px 33px; } 
+.contentsReserch .reserchHd dl { display: inline-block; vertical-align: middle; margin-top: 6px; position: relative; margin-right: 15px; } 
+.contentsReserch .reserchHd dl:after { content:""; position:absolute; width:1px; height: 13px; background: #a5a5a5; top: 4px; left: -10px; } 
+.contentsReserch .reserchHd dl:first-child:after { width:0; } 
+.contentsReserch .reserchHd dl dt { display: inline-block; vertical-align: middle; font-weight: 500; } 
+.contentsReserch .reserchHd dl dd { display: inline-block; vertical-align: middle; font-weight: 300; } 
+
+.contentsReserch .researchCon { margin-top: 17px; } 
+.contentsReserch .researchCon .feedback { margin-top: 20px; font-size: 0; } 
+.contentsReserch .researchCon .feedback input[type="text"] { width: calc(100% - 87px); } 
+.contentsReserch .researchCon .feedback button { height: 37px; min-width: 80px; background: #3378d6; color: #fff; } 
+
+.tableScroll { overflow:auto; } 
+.tableScroll .realTimeDataTb { width:1800px; } 
+.tableScroll .seawtItrsTb { width:1800px; } 
+.tableScroll .monthSeawtDataTb { width:1800px; } 
+
+.option-area { margin-top: 15px; border-top: 1px dotted #9d9d9d; padding-top: 10px; } 
+.chartArea { border: 1px solid #ddd; padding: 20px; height: 380px; margin-bottom: 30px; } 
+.chartArea-full {border: 1px solid #ddd;padding: 20px;height: calc(100vh - 280px);margin: 15px 0 30px 0;}
+.mapArea-full {border: 1px solid #ddd;height: 400px;width: 49%;}
+
+.listTotal { margin-top: 12px; font-weight: 500; padding: 3px 0px; padding-left: 21px; background: url("../images/cmn/ico_list_total.png") no-repeat left top 2px; } 
+.listTotal span {display: inline-block;margin: 0 3px;margin-right: 1px;font-weight: 600;color: #1f8be8;} 
+
+
+.search-box.searchCondition .formItem { display:inline-block; vertical-align: middle; } 
+
+.option-item { display: inline-block; vertical-align: middle; margin:3px 0; } 
+.option-area select + select { margin:5px 0; } 
+.option-area .form-tit { margin-right:5px; } 
+ 
+.editorArea { border: 1px solid #cdcdcd; height: 260px; padding: 20px; } 
+
+.serialTxt { margin-bottom: 20px; padding: 10px; background: #ebebeb; font-weight: 300; text-align: center; } 
+.serialTxt span { font-weight: 500; } 
+
+.cellBtn-map { background: #445dd6; border-radius: 5px; width: 40px; margin-left: 4px; height: 22px; color: #fff; } 
+
+.layerPop.ycWaterObsrSearch { width: 1030px; } 
+.layerPop.ycWaterObsrSearch .layerPop-con { height: auto; } 
+.layerPop.ycWaterObsrSearch .colImgBox { width: 250px; height: 225px; float: left; margin-right: 20px; } 
+.layerPop.ycWaterObsrSearch .pop-table { float: left; width: calc(100% - 270px); } 
+
+.layerPop.obsrSearch .colImgBox { width:32.33333%; height:250px; margin-right:1%; float:left; margin-bottom: 20px; } 
+.layerPop.gwData-using .layerPop-con { height:300px; } 
+.layerPop.partData-using .layerPop-con { height:300px; } 
+
+.layerPop.apiSignUp-sett table { width:100%; } 

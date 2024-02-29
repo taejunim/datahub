@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.jcms.framework.menu.mapper.MenuConnHistMapper">
+
+	<select id="selectList" parameterType="cmsMenuConnHist" resultType="cmsMenuConnHist">
+		SELECT MENU_ID, COUNT(MENU_CONN_HIST_ID) AS MENU_COUNT,
+			ROUND(COUNT(MENU_CONN_HIST_ID)/(SELECT COUNT(MENU_CONN_HIST_ID) FROM JCMS_MENU_CON_HIST)*100,2) AS PERCENT
+		FROM JCMS_MENU_CON_HIST
+		WHERE 1 = 1
+			<if test="!empty(menuId)" > AND MENU_ID = #{menuId} </if>
+			<if test="!empty(startRegDt)" > AND REG_DT >= CONCAT(#{startRegDt}, ' 00:00:00') </if>
+			<if test="!empty(endRegDt)" >
+				<![CDATA[
+					AND REG_DT <= CONCAT(#{endRegDt}, ' 23:59:59')
+				]]>
+			</if>
+		GROUP BY MENU_ID
+	</select>
+	
+	<select id="siteStats"  parameterType="cmsMenuConnHist" resultType="cmsMenuConnHist">
+		SELECT COUNT(HIST.MENU_CONN_HIST_ID) AS MENU_COUNT, DATE_FORMAT(HIST.REG_DT,'%Y-%m-%d') AS REG_DT
+		FROM JCMS_MENU_CON_HIST HIST, JCMS_MENU MENU
+		WHERE HIST.MENU_ID = MENU.MENU_ID
+			<if test="!empty(siteId)" > AND MENU.SITE_ID = #{siteId} </if>
+			<if test="startRegDt != null" >
+				<![CDATA[
+					AND HIST.REG_DT >= STR_TO_DATE(CONCAT(#{startRegDt}, ' 00:00:00'), '%Y-%m-%d %H:%i:%s')
+				]]>
+			</if>
+			<if test="endRegDt != null" >
+				<![CDATA[
+					AND HIST.REG_DT <= STR_TO_DATE(CONCAT(#{endRegDt}, ' 23:59:59'), '%Y-%m-%d %H:%i:%s')
+				]]>
+			</if>
+			AND MENU.MENU_URL = 'main'
+		GROUP BY DATE_FORMAT(HIST.REG_DT,'%Y-%m-%d')
+		ORDER BY DATE_FORMAT(HIST.REG_DT,'%Y-%m-%d') DESC
+	</select>
+	
+	<insert id="insert" parameterType="cmsMenuConnHist">
+		INSERT INTO JCMS_MENU_CON_HIST (
+			MENU_ID, MENU_CONN_IP, REG_ID, REG_DT
+		) VALUES (
+			#{menuId}, #{menuConnIp}, #{regId,jdbcType=NUMERIC}, SYSDATE()
+		)
+	</insert>
+
+</mapper>
